@@ -861,6 +861,7 @@ function renderCharts(){
       lineStyle: { width: 4, color: p.color, shadowColor: p.color, shadowBlur: 14 }, itemStyle: { color: p.color, borderColor: "#0a0f1a", borderWidth: 2 },
       areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: rgba(p.color, .28) }, { offset: 1, color: rgba(p.color, 0) }]) },
       endLabel: { show: true, formatter: "{a}  {c}", color: p.color, fontFamily: "Big Shoulders Display", fontWeight: 800, fontSize: 18 },
+      labelLayout: { moveOverlap: "shiftY" },
       emphasis: { focus: "series" }
     }))
   }, true);
@@ -886,7 +887,7 @@ function renderCharts(){
     });
     ga.setOption({
       series: P.map((p, i) => ({
-        type: "gauge", center: [(17 + i * 33) + "%", "56%"], radius: "36%", startAngle: 220, endAngle: -40, min: 0, max: 100,
+        type: "gauge", center: [(17 + i * 33) + "%", "52%"], radius: "44%", startAngle: 220, endAngle: -40, min: 0, max: 100,
         progress: { show: true, width: 12, roundCap: true, itemStyle: { color: p.color, shadowColor: p.color, shadowBlur: 10 } },
         axisLine: { roundCap: true, lineStyle: { width: 12, color: [[1, "#1c2945"]] } }, pointer: { show: false }, axisTick: { show: false }, splitLine: { show: false }, axisLabel: { show: false },
         title: { offsetCenter: [0, "88%"], color: p.color, fontFamily: "Big Shoulders Display", fontWeight: 800, fontSize: 18 },
