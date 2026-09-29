@@ -362,12 +362,12 @@ footer .wrap{display:grid;gap:6px;border-top:1px solid var(--line);padding-top:1
         </div>
         <fieldset id="formSet">
           <div class="row">
-            <div class="field"><label for="fWeek">Semaine</label><select id="fWeek"></select></div>
-            <div class="field"><label for="fPlayer">Joueur</label><select id="fPlayer"></select></div>
+            <div class="field"><label for="fWeek">Semaine</label><select id="fWeek" autocomplete="off"></select></div>
+            <div class="field"><label for="fPlayer">Joueur</label><select id="fPlayer" autocomplete="off"></select></div>
           </div>
           <div class="row">
-            <div class="field"><label for="fTeam" id="fTeamLbl">Équipe droppée</label><select id="fTeam"></select></div>
-            <div class="field" id="fInWrap" hidden><label for="fIn">Équipe qui arrive</label><select id="fIn"></select></div>
+            <div class="field"><label for="fTeam" id="fTeamLbl">Équipe droppée</label><select id="fTeam" autocomplete="off"></select></div>
+            <div class="field" id="fInWrap" hidden><label for="fIn">Équipe qui arrive</label><select id="fIn" autocomplete="off"></select></div>
           </div>
           <p class="help" id="fHelp"></p>
           <div class="row"><button class="btn primary" id="saveBtn">Enregistrer</button></div>
@@ -403,7 +403,7 @@ footer .wrap{display:grid;gap:6px;border-top:1px solid var(--line);padding-top:1
         <li>À partir de la 6<sup>e</sup> semaine, un joueur qui est à −7 ou pire peut échanger ses équipes sans limite jusqu'à ce qu'il revienne à −6. Il ajoute aussi une 8<sup>e</sup> équipe jusqu'à la fin de la saison.</li>
       </ol>
       <div class="money">
-        <div><span class="eyebrow">Saison régulière</span><br><b>100 $</b> chacun · le gagnant empoche <b>300 $</b></div>
+        <div><span class="eyebrow">Saison régulière</span><br><b>150 $</b> chacun · le gagnant empoche <b>450 $</b></div>
         <div><span class="eyebrow">Séries · celui qui va le plus loin</span><br><b>50 $</b> chacun · le gagnant empoche <b>150 $</b></div>
       </div>
     </div>
@@ -1017,6 +1017,10 @@ function renderManage(){
   $("#setupBox").hidden = !GH.on || (!GH.keyMissing && !GH.token);
   $("#setupSum").textContent = GH.keyMissing ? "Activer la sauvegarde en ligne (une seule fois)" : "Changer le code du pool";
   if (GH.keyMissing) $("#setupBox").open = true;
+  // 8e équipe : visible seulement si un joueur est en rattrapage (ou en a déjà une)
+  const show8 = P.some(p => R.catchUp[p.id] || rosterAt(p.id, W, DATA.entries).length > p.teams.length);
+  $("#tabAdd").hidden = !show8;
+  if (!show8 && KIND === "add") { KIND = "drop"; document.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-selected", String(x.dataset.kind === "drop"))); }
   refreshForm();
   // history
   const items = [...DATA.entries].sort((a, b) => String(b.at).localeCompare(String(a.at)));
