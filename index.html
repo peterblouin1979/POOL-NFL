@@ -469,6 +469,7 @@ const fmtTime = new Intl.DateTimeFormat("fr-CA", { hour: "numeric", minute: "2-d
 const fmtDay  = new Intl.DateTimeFormat("fr-CA", { weekday: "long", day: "numeric", month: "long" });
 const fmtWhen = new Intl.DateTimeFormat("fr-CA", { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
 const fmtShort= new Intl.DateTimeFormat("fr-CA", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
+const fmtRange= new Intl.DateTimeFormat("fr-CA", { weekday: "short", day: "numeric", month: "short" });
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 const plural = (n, one, many) => `${n} ${n > 1 || n === 0 ? many : one}`;
 const ord = (n) => n === 1 ? "1<sup>er</sup>" : `${n}<sup>e</sup>`;
@@ -790,8 +791,10 @@ function renderWeek(){
   if (!wk.games.length) html = `<div class="notice calm"><div>Calendrier indisponible pour cette semaine.</div></div>`;
   else {
     const before = wk.firstKick > Date.now();
-    const head = before ? `Premier match : <b>${esc(fmtWhen.format(wk.firstKick))}</b> (dans ${until(wk.firstKick)}).` :
-      wk.state === "final" ? `Semaine terminée.` : `Semaine en cours.`;
+    const lastKick = new Date(Math.max(...wk.games.map(g => +g.date)));
+    const range = `Matchs du ${fmtRange.format(wk.firstKick)} au ${fmtRange.format(lastKick)}. `;
+    const head = range + (before ? `Premier match : <b>${esc(fmtWhen.format(wk.firstKick))}</b> (dans ${until(wk.firstKick)}).` :
+      wk.state === "final" ? `Semaine terminée.` : `Semaine en cours.`);
     if (!needs.length) html = `<div class="notice calm"><div>${head} Aucun drop cette semaine : personne n'a d'équipe en bye.</div></div>`;
     else html = `<div class="notice"><div>${head} <b>Drops à annoncer${before ? " avant le premier match" : ""} :</b>
       <div class="drops">${needs.map(p => {
