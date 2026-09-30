@@ -212,6 +212,8 @@ section.block{display:grid;gap:18px;padding-block:44px 8px;min-width:0}
 .mo ul{list-style:none;margin:0;padding:0;display:grid;gap:3px;font-size:.88rem}
 .mo li{display:flex;justify-content:space-between;gap:8px;color:var(--muted)}
 .mo li span:first-child{color:var(--ink)}
+.mo li{align-items:center}
+.mo .qb{display:inline-flex;align-items:center;gap:8px;min-width:0}
 
 /* ---------- News ---------- */
 .news{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
@@ -445,9 +447,9 @@ const CONFIG = {
   github: { owner: "peterblouin1979", repo: "POOL-NFL", branch: "main", dataPath: "data.json", keyPath: "cle.json" },
   bets: {
     mvp: {
-      ben:   [{ id: "4431452", name: "Drake Maye" }, { id: "4431611", name: "Caleb Williams" }, { id: "3139477", name: "Patrick Mahomes" }],
-      steve: [{ id: "3918298", name: "Josh Allen" }, { id: "4038941", name: "Justin Herbert" }, { id: "4361741", name: "Brock Purdy" }],
-      pete:  [{ id: "12483", name: "Matthew Stafford" }, { id: "3916387", name: "Lamar Jackson" }, { id: "3915511", name: "Joe Burrow" }]
+      ben:   [{ id: "4431452", team: "NE", name: "Drake Maye" }, { id: "4431611", team: "CHI", name: "Caleb Williams" }, { id: "3139477", team: "KC", name: "Patrick Mahomes" }],
+      steve: [{ id: "3918298", team: "BUF", name: "Josh Allen" }, { id: "4038941", team: "LAC", name: "Justin Herbert" }, { id: "4361741", team: "SF", name: "Brock Purdy" }],
+      pete:  [{ id: "12483", team: "LAR", name: "Matthew Stafford" }, { id: "3916387", team: "BAL", name: "Lamar Jackson" }, { id: "3915511", team: "CIN", name: "Joe Burrow" }]
     },
     worst: { ben: "MIA", steve: "CLE", pete: "ARI" }
   },
@@ -905,7 +907,7 @@ function renderBets(){
     rows.map((r, i) => `<div class="mo ${i === 0 ? "lead" : ""}" style="--pc:${r.p.color}">
       <div class="mo-head"><strong>${esc(r.p.name)}</strong><span class="mo-pct">${pct(r.tot)}</span></div>
       <div class="mo-bar" aria-hidden="true"><i style="width:${(r.tot / top * 100).toFixed(1)}%"></i></div>
-      <ul>${r.picks.map(q => `<li><span>${esc(q.name)}</span><span class="num">${q.o ? esc(q.o) + " · " + pct(q.pr) : "hors marché"}</span></li>`).join("")}</ul></div>`).join("");
+      <ul>${r.picks.map(q => `<li><span class="qb">${logo(q.team, "sm")}${esc(q.name)}</span><span class="num">${q.o ? esc(q.o) + " · " + pct(q.pr) : "hors marché"}</span></li>`).join("")}</ul></div>`).join("");
   $("#mvpSrc").textContent = `Pourcentage : chance que le MVP soit un de ses 3 choix, selon les cotes ${MVP.prov || ""} (via ESPN)${MVP.live ? ", mises à jour automatiquement" : ", dernières cotes connues"}.`;
 }
 
