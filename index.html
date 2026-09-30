@@ -300,7 +300,7 @@ footer .wrap{display:grid;gap:6px;border-top:1px solid var(--line);padding-top:1
 
 <nav class="nav" aria-label="Sections">
   <div class="wrap">
-    <a href="#semaine">Cette semaine</a><a href="#graphiques">Graphiques</a><a href="#saison">Saison</a><a href="#paris">Paris</a><a href="#gestion">Drops &amp; échanges</a><a href="#nouvelles">Nouvelles NFL</a><a href="#reglements">Règlements</a><a href="#palmares">Palmarès</a>
+    <a href="#semaine">Cette semaine</a><a href="#saison">Saison</a><a href="#paris">Paris</a><a href="#gestion">Drops &amp; échanges</a><a href="#nouvelles">Nouvelles NFL</a><a href="#reglements">Règlements</a><a href="#palmares">Palmarès</a>
   </div>
 </nav>
 
@@ -317,14 +317,6 @@ footer .wrap{display:grid;gap:6px;border-top:1px solid var(--line);padding-top:1
     <div id="wkNotice"></div>
     <div class="tally" id="tally"></div>
     <div class="days" id="days"></div>
-  </section>
-
-  <section class="block" id="graphiques">
-    <div class="sec-head"><div><span class="eyebrow">Les chiffres</span><h2>Graphiques</h2></div><p>Tout se redessine automatiquement après chaque match.</p></div>
-    <div class="charts">
-      <div class="card chart-card wide"><h3>La course au titre</h3><p>Points cumulés semaine après semaine.</p><div class="chart tall" id="chRace"></div></div>
-      <div class="card chart-card wide"><h3>Taux de victoire</h3><p>Victoires de tes équipes actives sur les matchs joués.</p><div class="chart" id="chGauge" style="height:270px"></div></div>
-    </div>
   </section>
 
   <section class="block" id="saison">
@@ -432,7 +424,6 @@ footer .wrap{display:grid;gap:6px;border-top:1px solid var(--line);padding-top:1
 </div></footer>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.6.0/echarts.min.js"></script>
 <script>
 (function(){
 "use strict";
@@ -871,56 +862,6 @@ function renderWeek(){
   }).join("")}</div></div>`).join("");
 }
 
-/* ---------- Render: charts ---------- */
-const CH = {};
-function chart(id){
-  const el = document.getElementById(id);
-  if (!window.echarts) { el.innerHTML = `<div class="chart-fallback">Les graphiques n'ont pas pu se charger.</div>`; return null; }
-  return CH[id] || (CH[id] = echarts.init(el, null, { renderer: "canvas" }));
-}
-const rgba = (hex, a) => { const n = parseInt(hex.slice(1), 16); return `rgba(${n >> 16 & 255},${n >> 8 & 255},${n & 255},${a})`; };
-const AX = { axisLine: { lineStyle: { color: "#2e4064" } }, axisTick: { show: false }, axisLabel: { color: "#97a5c2", fontFamily: "Barlow" }, splitLine: { lineStyle: { color: "#1c2945", type: "dashed" } } };
-const TT = { backgroundColor: "#0d1422", borderColor: "#2e4064", textStyle: { color: "#eef2fb", fontFamily: "Barlow" } };
-function renderCharts(){
-  const n = Math.max(1, R.lastPlayed);
-  const xs = Array.from({ length: n }, (_, i) => "S" + (i + 1));
-  const race = chart("chRace");
-  if (race) race.setOption({
-    animationDuration: 1600, animationEasing: "cubicOut",
-    grid: { left: 36, right: 90, top: 20, bottom: 30 },
-    tooltip: { ...TT, trigger: "axis", valueFormatter: v => v == null ? "—" : v + " pts" },
-    xAxis: { type: "category", data: xs, boundaryGap: false, ...AX, splitLine: { show: false } },
-    yAxis: { type: "value", minInterval: 1, ...AX },
-    series: P.map(p => ({
-      name: p.name, type: "line", smooth: .35, symbol: "circle", symbolSize: 9, data: R.cum[p.id].slice(0, n),
-      lineStyle: { width: 4, color: p.color, shadowColor: p.color, shadowBlur: 14 }, itemStyle: { color: p.color, borderColor: "#0a0f1a", borderWidth: 2 },
-      areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: rgba(p.color, .28) }, { offset: 1, color: rgba(p.color, 0) }]) },
-      endLabel: { show: true, formatter: "{a}  {c}", color: p.color, fontFamily: "Big Shoulders Display", fontWeight: 800, fontSize: 18 },
-      labelLayout: { moveOverlap: "shiftY" },
-      emphasis: { focus: "series" }
-    }))
-  }, true);
-  const ga = chart("chGauge");
-  if (ga) {
-    const rate = P.map(p => {
-      let w = 0, g = 0;
-      for (let k = 1; k <= W; k++) Object.values(R.weeks[k].per[p.id].results).forEach(r => { if (r === "W") { w++; g++; } else if (r === "L" || r === "T") g++; });
-      return g ? Math.round(w / g * 100) : 0;
-    });
-    const gr = Math.round(Math.min(105, ga.getWidth() * 0.14)), big = gr > 70;
-    ga.setOption({
-      series: P.map((p, i) => ({
-        type: "gauge", center: [(17 + i * 33) + "%", "50%"], radius: gr, startAngle: 220, endAngle: -40, min: 0, max: 100,
-        progress: { show: true, width: big ? 12 : 8, roundCap: true, itemStyle: { color: p.color, shadowColor: p.color, shadowBlur: 10 } },
-        axisLine: { roundCap: true, lineStyle: { width: big ? 12 : 8, color: [[1, "#1c2945"]] } }, pointer: { show: false }, axisTick: { show: false }, splitLine: { show: false }, axisLabel: { show: false },
-        title: { offsetCenter: [0, "92%"], color: p.color, fontFamily: "Big Shoulders Display", fontWeight: 800, fontSize: big ? 18 : 14 },
-        detail: { offsetCenter: [0, "0%"], formatter: "{value}%", color: "#eef2fb", fontFamily: "Big Shoulders Display", fontWeight: 900, fontSize: big ? 30 : 20 },
-        data: [{ value: rate[i], name: p.name }], animationDuration: 1600
-      }))
-    }, true);
-  }
-}
-
 /* ---------- Render: season grid ---------- */
 function renderHeat(){
   let h = `<thead><tr><th></th>${Array.from({ length: W }, (_, i) => `<th>${i + 1}</th>`).join("")}<th>V</th></tr></thead><tbody>`;
@@ -1128,7 +1069,7 @@ async function onSetup(){
 function rerender(){
   compute();
   if (VIEW_W == null) VIEW_W = R.cur;
-  renderStatus(); renderHero(); renderWeek(); renderCharts(); renderHeat(); renderBets(); renderNews(); renderHonours(); renderManage();
+  renderStatus(); renderHero(); renderWeek(); renderHeat(); renderBets(); renderNews(); renderHonours(); renderManage();
 }
 function init(){
   fillSelect($("#fPlayer"), P.map(p => [p.id, p.name]));
@@ -1144,8 +1085,6 @@ function init(){
   $("#codeIn").onkeydown = (ev) => { if (ev.key === "Enter") $("#unlockBtn").click(); };
   $("#lockBtn").onclick = () => { GH.token = null; ls.del(KEY("code")); renderManage(); toast("Verrouillé sur cet appareil."); };
   $("#setupBtn").onclick = onSetup;
-  window.addEventListener("resize", () => Object.values(CH).forEach(c => c.resize()));
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (R) renderCharts(); });
 
   WEEKS = snapshotWeeks();
   DATA = GH.on ? { entries: [] } : cleanData(ls.get(KEY("demo")));
