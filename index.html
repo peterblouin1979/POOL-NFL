@@ -184,7 +184,7 @@ section.block{display:grid;gap:18px;padding-block:44px 8px;min-width:0}
 .legend i{width:14px;height:14px;border-radius:4px;display:inline-block}
 
 /* ---------- Bets ---------- */
-.bets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.bets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
 @media (max-width:860px){.bets{grid-template-columns:1fr}}
 .bet{padding:16px 18px;display:grid;gap:12px;align-content:start}
 .bet h3{font:800 1.4rem/1 var(--display);text-transform:uppercase}
@@ -199,6 +199,18 @@ section.block{display:grid;gap:18px;padding-block:44px 8px;min-width:0}
 .wt-name{display:grid;min-width:0}
 .wt-name small{color:var(--pc);font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:.7rem}
 .wt-rec{font:900 1.5rem/1 var(--display);font-variant-numeric:tabular-nums}
+.mvp-odds{display:grid;gap:10px}
+.bet .mvp-lead{margin:0;font-size:.95rem;color:var(--ink)}
+.mo{padding:10px 12px;border-radius:10px;background:var(--bg-2);border:1px solid var(--line);display:grid;gap:8px}
+.mo.lead{border-color:rgba(255,184,28,.45)}
+.mo-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.mo-head strong{font:900 1.15rem/1 var(--display);text-transform:uppercase;color:var(--pc)}
+.mo-pct{font:900 1.5rem/1 var(--display);font-variant-numeric:tabular-nums}
+.mo-bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.mo-bar i{display:block;height:100%;background:var(--pc);border-radius:3px;transition:width .8s ease}
+.mo ul{list-style:none;margin:0;padding:0;display:grid;gap:3px;font-size:.88rem}
+.mo li{display:flex;justify-content:space-between;gap:8px;color:var(--muted)}
+.mo li span:first-child{color:var(--ink)}
 
 /* ---------- News ---------- */
 .news{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
@@ -287,7 +299,7 @@ footer .wrap{display:grid;gap:6px;border-top:1px solid var(--line);padding-top:1
 
 <nav class="nav" aria-label="Sections">
   <div class="wrap">
-    <a href="#semaine">Cette semaine</a><a href="#graphiques">Graphiques</a><a href="#saison">Saison</a><a href="#paris">Paris</a><a href="#nouvelles">Nouvelles NFL</a><a href="#gestion">Drops &amp; échanges</a><a href="#reglements">Règlements</a><a href="#palmares">Palmarès</a>
+    <a href="#semaine">Cette semaine</a><a href="#graphiques">Graphiques</a><a href="#saison">Saison</a><a href="#paris">Paris</a><a href="#gestion">Drops &amp; échanges</a><a href="#nouvelles">Nouvelles NFL</a><a href="#reglements">Règlements</a><a href="#palmares">Palmarès</a>
   </div>
 </nav>
 
@@ -310,9 +322,7 @@ footer .wrap{display:grid;gap:6px;border-top:1px solid var(--line);padding-top:1
     <div class="sec-head"><div><span class="eyebrow">Les chiffres</span><h2>Graphiques</h2></div><p>Tout se redessine automatiquement après chaque match.</p></div>
     <div class="charts">
       <div class="card chart-card wide"><h3>La course au titre</h3><p>Points cumulés semaine après semaine.</p><div class="chart tall" id="chRace"></div></div>
-      <div class="card chart-card"><h3>Points par semaine</h3><p>La ligne marque le maximum de 5 points.</p><div class="chart" id="chWeeks"></div></div>
-      <div class="card chart-card"><h3>Taux de victoire</h3><p>Victoires de tes équipes actives sur les matchs joués.</p><div class="chart" id="chGauge"></div></div>
-      <div class="card chart-card wide"><h3>Qui porte qui</h3><p>Victoires qui ont compté, par équipe.</p><div class="chart" id="chTeams"></div></div>
+      <div class="card chart-card wide"><h3>Taux de victoire</h3><p>Victoires de tes équipes actives sur les matchs joués.</p><div class="chart" id="chGauge" style="height:270px"></div></div>
     </div>
   </section>
 
@@ -333,13 +343,8 @@ footer .wrap{display:grid;gap:6px;border-top:1px solid var(--line);padding-top:1
     <div class="sec-head"><div><span class="eyebrow">À côté du pool</span><h2>Paris de la saison</h2></div></div>
     <div class="bets">
       <div class="card bet"><h3>Pire équipe · 10 $</h3><p>Chacun doit 10 $ à celui dont l'équipe finit avec le pire dossier.</p><div class="worst" id="worst"></div></div>
-      <div class="card bet"><h3>MVP · 20 $</h3><p>Chacun doit 20 $ à celui qui a prédit le MVP.</p><div class="mvp" id="mvp"></div></div>
+      <div class="card bet"><h3>MVP · 20 $</h3><p>Chacun doit 20 $ à celui qui a prédit le MVP. En attendant la fin de la saison, on se fie aux cotes des parieurs.</p><div class="mvp-odds" id="mvp"></div><p class="help" id="mvpSrc"></p></div>
     </div>
-  </section>
-
-  <section class="block" id="nouvelles">
-    <div class="sec-head"><div><span class="eyebrow">Via ESPN · en anglais</span><h2>Nouvelles NFL</h2></div></div>
-    <div class="news" id="news"></div>
   </section>
 
   <section class="block" id="gestion">
@@ -392,6 +397,11 @@ footer .wrap{display:grid;gap:6px;border-top:1px solid var(--line);padding-top:1
     </div>
   </section>
 
+  <section class="block" id="nouvelles">
+    <div class="sec-head"><div><span class="eyebrow">Via ESPN · en anglais</span><h2>Nouvelles NFL</h2></div></div>
+    <div class="news" id="news"></div>
+  </section>
+
   <section class="block" id="reglements">
     <div class="sec-head"><div><span class="eyebrow">Ce qu'on a signé</span><h2>Règlements</h2></div></div>
     <div class="card rules">
@@ -442,7 +452,11 @@ const CONFIG = {
   /* Sauvegarde des drops/échanges dans GitHub. Vide = mode aperçu (sur l'appareil seulement). */
   github: { owner: "peterblouin1979", repo: "POOL-NFL", branch: "main", dataPath: "data.json", keyPath: "cle.json" },
   bets: {
-    mvp:   { ben: ["Maye","Williams","Mahomes"], steve: ["Allen","Herbert","Purdy"], pete: ["Stafford","Jackson","Burrow"] },
+    mvp: {
+      ben:   [{ id: "4431452", name: "Drake Maye" }, { id: "4431611", name: "Caleb Williams" }, { id: "3139477", name: "Patrick Mahomes" }],
+      steve: [{ id: "3918298", name: "Josh Allen" }, { id: "4038941", name: "Justin Herbert" }, { id: "4361741", name: "Brock Purdy" }],
+      pete:  [{ id: "12483", name: "Matthew Stafford" }, { id: "3916387", name: "Lamar Jackson" }, { id: "3915511", name: "Joe Burrow" }]
+    },
     worst: { ben: "MIA", steve: "CLE", pete: "ARI" }
   },
   honours: [
@@ -451,7 +465,7 @@ const CONFIG = {
     { season: "2023-2024", regular: "Benoit Blouin", playoff: "Steve Bérard",  note: "Victoires : Benoit 89 · Steve 84" }
   ]
 };
-const SNAPSHOT = {"taken":"2026-09-29T22:30:00Z","teams":{"SEA":["Seattle","Seahawks","002a5c","69be28","26"],"NE":["New England","Patriots","002a5c","c60c30","17"],"LAR":["Los Angeles","Rams","003594","ffd100","14"],"SF":["San Francisco","49ers","aa0000","b3995d","25"],"CIN":["Cincinnati","Bengals","fb4f14","000000","4"],"TB":["Tampa Bay","Buccaneers","bd1c36","3e3a35","27"],"DET":["Detroit","Lions","0076b6","bbbbbb","8"],"NO":["New Orleans","Saints","d3bc8d","000000","18"],"TEN":["Tennessee","Titans","4495d2","001532","10"],"NYJ":["New York","Jets","115740","ffffff","20"],"IND":["Indianapolis","Colts","003b75","ffffff","11"],"BAL":["Baltimore","Ravens","29126f","000000","33"],"PIT":["Pittsburgh","Steelers","000000","ffb612","23"],"ATL":["Atlanta","Falcons","a71930","000000","1"],"CAR":["Carolina","Panthers","0085ca","000000","29"],"CHI":["Chicago","Bears","0b1c3a","e64100","3"],"JAX":["Jacksonville","Jaguars","007487","d7a22a","30"],"CLE":["Cleveland","Browns","472a08","ff3c00","5"],"HOU":["Houston","Texans","021018","eb0028","34"],"BUF":["Buffalo","Bills","00338d","d50a0a","2"],"LV":["Las Vegas","Raiders","000000","a5acaf","13"],"MIA":["Miami","Dolphins","008e97","fc4c02","15"],"MIN":["Minnesota","Vikings","4f2683","ffc62f","16"],"GB":["Green Bay","Packers","204e32","ffb612","9"],"PHI":["Philadelphia","Eagles","06424d","000000","21"],"WSH":["Washington","Commanders","5a1414","ffb612","28"],"LAC":["Los Angeles","Chargers","0080c6","ffc20e","24"],"ARI":["Arizona","Cardinals","a40227","ffffff","22"],"NYG":["New York","Giants","003c7f","c9243f","19"],"DAL":["Dallas","Cowboys","002a5c","b0b7bc","6"],"KC":["Kansas City","Chiefs","e31837","ffb612","12"],"DEN":["Denver","Broncos","0a2343","fc4c02","7"]},"G":[["NE|SEA|10|13|post|2026-09-10T00:20","SF|LAR|27|7|post|2026-09-11T00:35","TB|CIN|27|33|post|2026-09-13T17:00","NO|DET|30|31|post|2026-09-13T17:00","NYJ|TEN|23|10|post|2026-09-13T17:00","BAL|IND|41|23|post|2026-09-13T17:00","ATL|PIT|13|20|post|2026-09-13T17:00","CHI|CAR|59|37|post|2026-09-13T17:00","CLE|JAX|10|34|post|2026-09-13T17:00","BUF|HOU|36|31|post|2026-09-13T17:00","MIA|LV|13|27|post|2026-09-13T20:25","GB|MIN|22|39|post|2026-09-13T20:25","WSH|PHI|22|24|post|2026-09-13T20:25","ARI|LAC|26|14|post|2026-09-13T20:25","DAL|NYG|20|28|post|2026-09-14T00:20","DEN|KC|10|31|post|2026-09-15T00:15"],["DET|BUF|31|41|post|2026-09-18T00:15","CAR|ATL|34|3|post|2026-09-20T17:00","MIN|CHI|9|3|post|2026-09-20T17:00","PHI|TEN|24|20|post|2026-09-20T17:00","PIT|NE|3|20|post|2026-09-20T17:00","GB|NYJ|20|17|post|2026-09-20T17:00","CLE|TB|23|19|post|2026-09-20T17:00","NO|BAL|24|17|post|2026-09-20T17:00","CIN|HOU|20|6|post|2026-09-20T17:00","JAX|DEN|13|20|post|2026-09-20T20:05","LV|LAC|26|14|post|2026-09-20T20:05","WSH|DAL|20|37|post|2026-09-20T20:25","SEA|ARI|31|7|post|2026-09-20T20:25","MIA|SF|13|35|post|2026-09-20T20:25","IND|KC|30|33|post|2026-09-21T00:20","NYG|LAR|6|28|post|2026-09-22T00:15"],["ATL|GB|35|14|post|2026-09-25T00:15","LAC|BUF|16|24|post|2026-09-27T17:00","CAR|CLE|18|21|post|2026-09-27T17:00","NYJ|DET|24|31|post|2026-09-27T17:00","HOU|IND|17|19|post|2026-09-27T17:00","KC|MIA|24|10|post|2026-09-27T17:00","TEN|NYG|7|12|post|2026-09-27T17:00","CIN|PIT|27|30|post|2026-09-27T17:00","SEA|WSH|31|33|post|2026-09-27T17:00","NE|JAX|6|35|post|2026-09-27T17:00","ARI|SF|30|36|post|2026-09-27T20:05","MIN|TB|23|16|post|2026-09-27T20:05","BAL|DAL|34|31|post|2026-09-27T20:25","LV|NO|35|27|post|2026-09-27T20:25","LAR|DEN|26|30|post|2026-09-28T00:20","PHI|CHI|7|27|post|2026-09-29T00:15"],["PIT|CLE|0|0|pre|2026-10-02T00:15","IND|WSH|0|0|pre|2026-10-04T13:30","NE|BUF|0|0|pre|2026-10-04T17:00","NYJ|CHI|0|0|pre|2026-10-04T17:00","JAX|CIN|0|0|pre|2026-10-04T17:00","ARI|NYG|0|0|pre|2026-10-04T17:00","LAR|PHI|0|0|pre|2026-10-04T17:00","GB|TB|0|0|pre|2026-10-04T17:00","TEN|BAL|0|0|pre|2026-10-04T17:00","DAL|HOU|0|0|pre|2026-10-04T17:00","MIA|MIN|0|0|pre|2026-10-04T20:05","KC|LV|0|0|pre|2026-10-04T20:25","DEN|SF|0|0|pre|2026-10-04T20:25","LAC|SEA|0|0|pre|2026-10-04T20:25","DET|CAR|0|0|pre|2026-10-05T00:20","ATL|NO|0|0|pre|2026-10-06T00:15"],["TB|DAL|0|0|pre|2026-10-09T00:15","PHI|JAX|0|0|pre|2026-10-11T13:30","CHI|GB|0|0|pre|2026-10-11T17:00","HOU|TEN|0|0|pre|2026-10-11T17:00","CIN|MIA|0|0|pre|2026-10-11T17:00","LV|NE|0|0|pre|2026-10-11T17:00","MIN|NO|0|0|pre|2026-10-11T17:00","CLE|NYJ|0|0|pre|2026-10-11T17:00","IND|PIT|0|0|pre|2026-10-11T17:00","NYG|WSH|0|0|pre|2026-10-11T17:00","DEN|LAC|0|0|pre|2026-10-11T20:05","DET|ARI|0|0|pre|2026-10-11T20:25","SF|SEA|0|0|pre|2026-10-11T20:25","BAL|ATL|0|0|pre|2026-10-12T00:20","BUF|LAR|0|0|pre|2026-10-13T00:15"],["SEA|DEN|0|0|pre|2026-10-16T00:15","HOU|JAX|0|0|pre|2026-10-18T13:30","CHI|ATL|0|0|pre|2026-10-18T17:00","BAL|CLE|0|0|pre|2026-10-18T17:00","TEN|IND|0|0|pre|2026-10-18T17:00","NYJ|NE|0|0|pre|2026-10-18T17:00","NO|NYG|0|0|pre|2026-10-18T17:00","CAR|PHI|0|0|pre|2026-10-18T17:00","PIT|TB|0|0|pre|2026-10-18T17:00","ARI|LAR|0|0|pre|2026-10-18T20:05","LAC|KC|0|0|pre|2026-10-18T20:25","BUF|LV|0|0|pre|2026-10-18T20:25","DAL|GB|0|0|pre|2026-10-19T00:20","WSH|SF|0|0|pre|2026-10-20T00:15"],["NE|CHI|0|0|pre|2026-10-23T00:15","PIT|NO|0|0|pre|2026-10-25T13:30","SF|ATL|0|0|pre|2026-10-25T17:00","CLE|TEN|0|0|pre|2026-10-25T17:00","IND|MIN|0|0|pre|2026-10-25T17:00","MIA|NYJ|0|0|pre|2026-10-25T17:00","TB|CAR|0|0|pre|2026-10-25T17:00","CIN|BAL|0|0|pre|2026-10-25T17:00","NYG|HOU|0|0|pre|2026-10-25T17:00","DEN|ARI|0|0|pre|2026-10-25T20:05","GB|DET|0|0|pre|2026-10-25T20:25","LAR|LV|0|0|pre|2026-10-25T20:25","KC|SEA|0|0|pre|2026-10-26T00:20","DAL|PHI|0|0|pre|2026-10-27T00:15"],["CAR|GB|0|0|pre|2026-10-30T00:15","BAL|BUF|0|0|pre|2026-11-01T18:00","TEN|CIN|0|0|pre|2026-11-01T18:00","ARI|DAL|0|0|pre|2026-11-01T18:00","MIN|DET|0|0|pre|2026-11-01T18:00","LV|NYJ|0|0|pre|2026-11-01T18:00","CLE|PIT|0|0|pre|2026-11-01T18:00","ATL|TB|0|0|pre|2026-11-01T18:00","IND|JAX|0|0|pre|2026-11-01T18:00","LAC|LAR|0|0|pre|2026-11-01T21:05","KC|DEN|0|0|pre|2026-11-01T21:25","NE|MIA|0|0|pre|2026-11-01T21:25","PHI|WSH|0|0|pre|2026-11-02T01:20","CHI|SEA|0|0|pre|2026-11-03T01:15"],["JAX|BAL|0|0|pre|2026-11-06T01:15","CIN|ATL|0|0|pre|2026-11-08T14:30","DAL|IND|0|0|pre|2026-11-08T18:00","NYJ|KC|0|0|pre|2026-11-08T18:00","DET|MIA|0|0|pre|2026-11-08T18:00","CLE|NO|0|0|pre|2026-11-08T18:00","NYG|PHI|0|0|pre|2026-11-08T18:00","LAR|WSH|0|0|pre|2026-11-08T18:00","DEN|CAR|0|0|pre|2026-11-08T18:00","HOU|LAC|0|0|pre|2026-11-08T21:05","LV|SF|0|0|pre|2026-11-08T21:05","GB|NE|0|0|pre|2026-11-08T21:25","ARI|SEA|0|0|pre|2026-11-08T21:25","TB|CHI|0|0|pre|2026-11-09T01:20","BUF|MIN|0|0|pre|2026-11-10T01:15"],["WSH|NYG|0|0|pre|2026-11-13T01:15","NE|DET|0|0|pre|2026-11-15T14:30","KC|ATL|0|0|pre|2026-11-15T18:00","HOU|CLE|0|0|pre|2026-11-15T18:00","MIN|GB|0|0|pre|2026-11-15T18:00","JAX|TEN|0|0|pre|2026-11-15T18:00","MIA|IND|0|0|pre|2026-11-15T18:00","CAR|NO|0|0|pre|2026-11-15T18:00","BUF|NYJ|0|0|pre|2026-11-15T18:00","SEA|LV|0|0|pre|2026-11-15T21:05","LAR|ARI|0|0|pre|2026-11-15T21:05","SF|DAL|0|0|pre|2026-11-15T21:25","PIT|CIN|0|0|pre|2026-11-16T01:20","LAC|BAL|0|0|pre|2026-11-17T01:15"],["IND|HOU|0|0|pre|2026-11-20T01:15","MIA|BUF|0|0|pre|2026-11-22T18:00","NO|CHI|0|0|pre|2026-11-22T18:00","TEN|DAL|0|0|pre|2026-11-22T18:00","TB|DET|0|0|pre|2026-11-22T18:00","ARI|KC|0|0|pre|2026-11-22T18:00","JAX|NYG|0|0|pre|2026-11-22T18:00","BAL|CAR|0|0|pre|2026-11-22T18:00","NYJ|LAC|0|0|pre|2026-11-22T21:05","LV|DEN|0|0|pre|2026-11-22T21:25","PIT|PHI|0|0|pre|2026-11-22T21:25","MIN|SF|0|0|pre|2026-11-23T01:20","CIN|WSH|0|0|pre|2026-11-24T01:15"],["GB|LAR|0|0|pre|2026-11-26T01:00","CHI|DET|0|0|pre|2026-11-26T18:00","PHI|DAL|0|0|pre|2026-11-26T21:30","KC|BUF|0|0|pre|2026-11-27T01:20","DEN|PIT|0|0|pre|2026-11-27T20:00","NO|CIN|0|0|pre|2026-11-29T18:00","LV|CLE|0|0|pre|2026-11-29T18:00","NYG|IND|0|0|pre|2026-11-29T18:00","NYJ|MIA|0|0|pre|2026-11-29T18:00","ATL|MIN|0|0|pre|2026-11-29T18:00","BAL|HOU|0|0|pre|2026-11-29T18:00","TEN|JAX|0|0|pre|2026-11-29T21:05","WSH|ARI|0|0|pre|2026-11-29T21:25","SEA|SF|0|0|pre|2026-11-29T21:25","NE|LAC|0|0|pre|2026-11-30T01:20","CAR|TB|0|0|pre|2026-12-01T01:15"],["KC|LAR|0|0|pre|2026-12-04T01:15","DET|ATL|0|0|pre|2026-12-06T18:00","JAX|CHI|0|0|pre|2026-12-06T18:00","CIN|CLE|0|0|pre|2026-12-06T18:00","WSH|TEN|0|0|pre|2026-12-06T18:00","GB|NO|0|0|pre|2026-12-06T18:00","SF|NYG|0|0|pre|2026-12-06T18:00","LAC|TB|0|0|pre|2026-12-06T18:00","MIA|DEN|0|0|pre|2026-12-06T21:05","PHI|ARI|0|0|pre|2026-12-06T21:05","CAR|MIN|0|0|pre|2026-12-06T21:25","BUF|NE|0|0|pre|2026-12-06T21:25","HOU|PIT|0|0|pre|2026-12-07T01:20","DAL|SEA|0|0|pre|2026-12-08T01:15"],["MIN|NE|0|0|pre|2026-12-11T01:15","ATL|CLE|0|0|pre|2026-12-13T18:00","TEN|DET|0|0|pre|2026-12-13T18:00","CHI|MIA|0|0|pre|2026-12-13T18:00","DEN|NYJ|0|0|pre|2026-12-13T18:00","IND|PHI|0|0|pre|2026-12-13T18:00","HOU|WSH|0|0|pre|2026-12-13T18:00","NO|CAR|0|0|pre|2026-12-13T18:00","TB|BAL|0|0|pre|2026-12-13T18:00","LAC|LV|0|0|pre|2026-12-13T21:05","KC|CIN|0|0|pre|2026-12-13T21:25","LAR|SF|0|0|pre|2026-12-13T21:25","NYG|SEA|0|0|pre|2026-12-13T21:25","BUF|GB|0|0|pre|2026-12-14T01:20","PIT|JAX|0|0|pre|2026-12-15T01:15"],["SF|LAC|0|0|pre|2026-12-18T01:15","SEA|PHI|0|0|pre|2026-12-19T22:00","CHI|BUF|0|0|pre|2026-12-20T01:20","MIA|GB|0|0|pre|2026-12-20T18:00","IND|TEN|0|0|pre|2026-12-20T18:00","CLE|NYG|0|0|pre|2026-12-20T18:00","BAL|PIT|0|0|pre|2026-12-20T18:00","NO|TB|0|0|pre|2026-12-20T18:00","ATL|WSH|0|0|pre|2026-12-20T18:00","CIN|CAR|0|0|pre|2026-12-20T18:00","JAX|HOU|0|0|pre|2026-12-20T18:00","NYJ|ARI|0|0|pre|2026-12-20T21:05","DEN|LV|0|0|pre|2026-12-20T21:25","DAL|LAR|0|0|pre|2026-12-20T21:25","DET|MIN|0|0|pre|2026-12-21T01:20","NE|KC|0|0|pre|2026-12-22T01:15"],["HOU|PHI|0|0|pre|2026-12-25T01:15","GB|CHI|0|0|pre|2026-12-25T18:00","BUF|DEN|0|0|pre|2026-12-25T21:30","LAR|SEA|0|0|pre|2026-12-26T01:15","TB|ATL|0|0|pre|2026-12-27T05:00","CIN|IND|0|0|pre|2026-12-27T05:00","WSH|MIN|0|0|pre|2026-12-27T05:00","CAR|PIT|0|0|pre|2026-12-27T05:00","LAC|MIA|0|0|pre|2026-12-27T18:00","ARI|NO|0|0|pre|2026-12-27T18:00","NE|NYJ|0|0|pre|2026-12-27T18:00","CLE|BAL|0|0|pre|2026-12-27T18:00","TEN|LV|0|0|pre|2026-12-27T21:05","SF|KC|0|0|pre|2026-12-27T21:25","JAX|DAL|0|0|pre|2026-12-28T01:20","NYG|DET|0|0|pre|2026-12-29T01:15"],["BAL|CIN|0|0|pre|2027-01-01T01:15","DEN|NE|0|0|pre|2027-01-03T05:00","KC|LAC|0|0|pre|2027-01-03T05:00","LAR|TB|0|0|pre|2027-01-03T05:00","WSH|JAX|0|0|pre|2027-01-03T05:00","NO|ATL|0|0|pre|2027-01-03T18:00","IND|CLE|0|0|pre|2027-01-03T18:00","NYG|DAL|0|0|pre|2027-01-03T18:00","PIT|TEN|0|0|pre|2027-01-03T18:00","BUF|MIA|0|0|pre|2027-01-03T18:00","MIN|NYJ|0|0|pre|2027-01-03T18:00","SEA|CAR|0|0|pre|2027-01-03T18:00","LV|ARI|0|0|pre|2027-01-03T21:05","DET|CHI|0|0|pre|2027-01-03T21:25","PHI|SF|0|0|pre|2027-01-04T01:20","HOU|GB|0|0|pre|2027-01-05T01:15"],["NYJ|BUF|0|0|pre|2027-01-10T05:00","CLE|CIN|0|0|pre|2027-01-10T05:00","LAC|DEN|0|0|pre|2027-01-10T05:00","DET|GB|0|0|pre|2027-01-10T05:00","JAX|IND|0|0|pre|2027-01-10T05:00","LV|KC|0|0|pre|2027-01-10T05:00","SEA|LAR|0|0|pre|2027-01-10T05:00","CHI|MIN|0|0|pre|2027-01-10T05:00","MIA|NE|0|0|pre|2027-01-10T05:00","TB|NO|0|0|pre|2027-01-10T05:00","PHI|NYG|0|0|pre|2027-01-10T05:00","SF|ARI|0|0|pre|2027-01-10T05:00","DAL|WSH|0|0|pre|2027-01-10T05:00","ATL|CAR|0|0|pre|2027-01-10T05:00","PIT|BAL|0|0|pre|2027-01-10T05:00","TEN|HOU|0|0|pre|2027-01-10T05:00"]],"news":[{"h":"Get ready for Colts-Commanders in London, Falcons-Saints on MNF","d":"","t":"2026-09-29T21:31:29Z","img":"https://espnmedia-cdn.akamaized.net/espn/media/common/2026/0929/dm_260929_nfl_week4promo/dm_260929_nfl_week4promo.jpg","u":"https://www.espn.com/video/clip/_/id/50061571/get-ready-colts-commanders-london-falcons-saints-mnf","type":"Media"},{"h":"Patriots place offensive lineman Greg Van Roten (thigh) on IR","d":"The Patriots placed guard Greg Van Roten on injured reserve Tuesday as the infrastructure around quarterback Drake Maye took another hit.","t":"2026-09-29T21:02:48Z","img":"https://a.espncdn.com/photo/2026/0929/r1723591_1296x729_16-9.jpg","u":"https://www.espn.com/nfl/story/_/id/50061293/patriots-place-offensive-lineman-greg-van-roten-thigh-ir","type":"HeadlineNews"},{"h":"Inside George Kittle's 243-day recovery from torn Achilles","d":"Despite tearing his Achilles in the playoffs, Kittle appears to be back to his normal self. Here's how he won the recovery process.","t":"2026-09-29T20:33:47Z","img":"https://a.espncdn.com/photo/2026/0929/r1723524_2_608x342_16-9.jpg","u":"https://www.espn.com/nfl/story/_/id/50059771/san-francisco-49ers-george-kittle-torn-achilles-recovery","type":"Story"},{"h":"Knockout league pickups: Josh Allen, Justin Jefferson among big names available in Week 4","d":"Tristan H. Cockcroft lists the most common players on eliminated teams and finds how much FAB to spend this week.","t":"2026-09-29T19:55:19Z","img":"https://a.espncdn.com/photo/2026/0929/r1723553_608x342_16-9.jpg","u":"https://www.espn.com/fantasy/football/story/_/id/50052708/espn-nfl-fantasy-football-knockout-league-picks-week-4-strategy-adds","type":"Story"},{"h":"Falcons' Tua Tagovailoa healing, embracing backup QB role","d":"Falcons QB Tua Tagovailoa said he's not 100% recovered from his oblique injury but is embracing his role as backup to Michael Penix Jr.","t":"2026-09-29T18:56:00Z","img":"https://a.espncdn.com/photo/2026/0907/r1712973_1296x729_16-9.jpg","u":"https://www.espn.com/nfl/story/_/id/50060106/falcons-tua-tagovailoa-healing-embracing-backup-qb-role","type":"HeadlineNews"},{"h":"A.J. Hawk wouldn't be shocked if another team signs OBJ","d":"","t":"2026-09-29T18:51:42Z","img":"https://espnmedia-cdn.akamaized.net/espn/media/common/2026/0929/ss_20260929_144045264_3679239/ss_20260929_144045264_3679239.jpg","u":"https://www.espn.com/video/clip/_/id/50060143/aj-hawk-shocked-another-team-signs-obj","type":"Media"}]};
+const SNAPSHOT = {"taken":"2026-09-29T22:30:00Z","teams":{"SEA":["Seattle","Seahawks","002a5c","69be28","26"],"NE":["New England","Patriots","002a5c","c60c30","17"],"LAR":["Los Angeles","Rams","003594","ffd100","14"],"SF":["San Francisco","49ers","aa0000","b3995d","25"],"CIN":["Cincinnati","Bengals","fb4f14","000000","4"],"TB":["Tampa Bay","Buccaneers","bd1c36","3e3a35","27"],"DET":["Detroit","Lions","0076b6","bbbbbb","8"],"NO":["New Orleans","Saints","d3bc8d","000000","18"],"TEN":["Tennessee","Titans","4495d2","001532","10"],"NYJ":["New York","Jets","115740","ffffff","20"],"IND":["Indianapolis","Colts","003b75","ffffff","11"],"BAL":["Baltimore","Ravens","29126f","000000","33"],"PIT":["Pittsburgh","Steelers","000000","ffb612","23"],"ATL":["Atlanta","Falcons","a71930","000000","1"],"CAR":["Carolina","Panthers","0085ca","000000","29"],"CHI":["Chicago","Bears","0b1c3a","e64100","3"],"JAX":["Jacksonville","Jaguars","007487","d7a22a","30"],"CLE":["Cleveland","Browns","472a08","ff3c00","5"],"HOU":["Houston","Texans","021018","eb0028","34"],"BUF":["Buffalo","Bills","00338d","d50a0a","2"],"LV":["Las Vegas","Raiders","000000","a5acaf","13"],"MIA":["Miami","Dolphins","008e97","fc4c02","15"],"MIN":["Minnesota","Vikings","4f2683","ffc62f","16"],"GB":["Green Bay","Packers","204e32","ffb612","9"],"PHI":["Philadelphia","Eagles","06424d","000000","21"],"WSH":["Washington","Commanders","5a1414","ffb612","28"],"LAC":["Los Angeles","Chargers","0080c6","ffc20e","24"],"ARI":["Arizona","Cardinals","a40227","ffffff","22"],"NYG":["New York","Giants","003c7f","c9243f","19"],"DAL":["Dallas","Cowboys","002a5c","b0b7bc","6"],"KC":["Kansas City","Chiefs","e31837","ffb612","12"],"DEN":["Denver","Broncos","0a2343","fc4c02","7"]},"G":[["NE|SEA|10|13|post|2026-09-10T00:20","SF|LAR|27|7|post|2026-09-11T00:35","TB|CIN|27|33|post|2026-09-13T17:00","NO|DET|30|31|post|2026-09-13T17:00","NYJ|TEN|23|10|post|2026-09-13T17:00","BAL|IND|41|23|post|2026-09-13T17:00","ATL|PIT|13|20|post|2026-09-13T17:00","CHI|CAR|59|37|post|2026-09-13T17:00","CLE|JAX|10|34|post|2026-09-13T17:00","BUF|HOU|36|31|post|2026-09-13T17:00","MIA|LV|13|27|post|2026-09-13T20:25","GB|MIN|22|39|post|2026-09-13T20:25","WSH|PHI|22|24|post|2026-09-13T20:25","ARI|LAC|26|14|post|2026-09-13T20:25","DAL|NYG|20|28|post|2026-09-14T00:20","DEN|KC|10|31|post|2026-09-15T00:15"],["DET|BUF|31|41|post|2026-09-18T00:15","CAR|ATL|34|3|post|2026-09-20T17:00","MIN|CHI|9|3|post|2026-09-20T17:00","PHI|TEN|24|20|post|2026-09-20T17:00","PIT|NE|3|20|post|2026-09-20T17:00","GB|NYJ|20|17|post|2026-09-20T17:00","CLE|TB|23|19|post|2026-09-20T17:00","NO|BAL|24|17|post|2026-09-20T17:00","CIN|HOU|20|6|post|2026-09-20T17:00","JAX|DEN|13|20|post|2026-09-20T20:05","LV|LAC|26|14|post|2026-09-20T20:05","WSH|DAL|20|37|post|2026-09-20T20:25","SEA|ARI|31|7|post|2026-09-20T20:25","MIA|SF|13|35|post|2026-09-20T20:25","IND|KC|30|33|post|2026-09-21T00:20","NYG|LAR|6|28|post|2026-09-22T00:15"],["ATL|GB|35|14|post|2026-09-25T00:15","LAC|BUF|16|24|post|2026-09-27T17:00","CAR|CLE|18|21|post|2026-09-27T17:00","NYJ|DET|24|31|post|2026-09-27T17:00","HOU|IND|17|19|post|2026-09-27T17:00","KC|MIA|24|10|post|2026-09-27T17:00","TEN|NYG|7|12|post|2026-09-27T17:00","CIN|PIT|27|30|post|2026-09-27T17:00","SEA|WSH|31|33|post|2026-09-27T17:00","NE|JAX|6|35|post|2026-09-27T17:00","ARI|SF|30|36|post|2026-09-27T20:05","MIN|TB|23|16|post|2026-09-27T20:05","BAL|DAL|34|31|post|2026-09-27T20:25","LV|NO|35|27|post|2026-09-27T20:25","LAR|DEN|26|30|post|2026-09-28T00:20","PHI|CHI|7|27|post|2026-09-29T00:15"],["PIT|CLE|0|0|pre|2026-10-02T00:15","IND|WSH|0|0|pre|2026-10-04T13:30","NE|BUF|0|0|pre|2026-10-04T17:00","NYJ|CHI|0|0|pre|2026-10-04T17:00","JAX|CIN|0|0|pre|2026-10-04T17:00","ARI|NYG|0|0|pre|2026-10-04T17:00","LAR|PHI|0|0|pre|2026-10-04T17:00","GB|TB|0|0|pre|2026-10-04T17:00","TEN|BAL|0|0|pre|2026-10-04T17:00","DAL|HOU|0|0|pre|2026-10-04T17:00","MIA|MIN|0|0|pre|2026-10-04T20:05","KC|LV|0|0|pre|2026-10-04T20:25","DEN|SF|0|0|pre|2026-10-04T20:25","LAC|SEA|0|0|pre|2026-10-04T20:25","DET|CAR|0|0|pre|2026-10-05T00:20","ATL|NO|0|0|pre|2026-10-06T00:15"],["TB|DAL|0|0|pre|2026-10-09T00:15","PHI|JAX|0|0|pre|2026-10-11T13:30","CHI|GB|0|0|pre|2026-10-11T17:00","HOU|TEN|0|0|pre|2026-10-11T17:00","CIN|MIA|0|0|pre|2026-10-11T17:00","LV|NE|0|0|pre|2026-10-11T17:00","MIN|NO|0|0|pre|2026-10-11T17:00","CLE|NYJ|0|0|pre|2026-10-11T17:00","IND|PIT|0|0|pre|2026-10-11T17:00","NYG|WSH|0|0|pre|2026-10-11T17:00","DEN|LAC|0|0|pre|2026-10-11T20:05","DET|ARI|0|0|pre|2026-10-11T20:25","SF|SEA|0|0|pre|2026-10-11T20:25","BAL|ATL|0|0|pre|2026-10-12T00:20","BUF|LAR|0|0|pre|2026-10-13T00:15"],["SEA|DEN|0|0|pre|2026-10-16T00:15","HOU|JAX|0|0|pre|2026-10-18T13:30","CHI|ATL|0|0|pre|2026-10-18T17:00","BAL|CLE|0|0|pre|2026-10-18T17:00","TEN|IND|0|0|pre|2026-10-18T17:00","NYJ|NE|0|0|pre|2026-10-18T17:00","NO|NYG|0|0|pre|2026-10-18T17:00","CAR|PHI|0|0|pre|2026-10-18T17:00","PIT|TB|0|0|pre|2026-10-18T17:00","ARI|LAR|0|0|pre|2026-10-18T20:05","LAC|KC|0|0|pre|2026-10-18T20:25","BUF|LV|0|0|pre|2026-10-18T20:25","DAL|GB|0|0|pre|2026-10-19T00:20","WSH|SF|0|0|pre|2026-10-20T00:15"],["NE|CHI|0|0|pre|2026-10-23T00:15","PIT|NO|0|0|pre|2026-10-25T13:30","SF|ATL|0|0|pre|2026-10-25T17:00","CLE|TEN|0|0|pre|2026-10-25T17:00","IND|MIN|0|0|pre|2026-10-25T17:00","MIA|NYJ|0|0|pre|2026-10-25T17:00","TB|CAR|0|0|pre|2026-10-25T17:00","CIN|BAL|0|0|pre|2026-10-25T17:00","NYG|HOU|0|0|pre|2026-10-25T17:00","DEN|ARI|0|0|pre|2026-10-25T20:05","GB|DET|0|0|pre|2026-10-25T20:25","LAR|LV|0|0|pre|2026-10-25T20:25","KC|SEA|0|0|pre|2026-10-26T00:20","DAL|PHI|0|0|pre|2026-10-27T00:15"],["CAR|GB|0|0|pre|2026-10-30T00:15","BAL|BUF|0|0|pre|2026-11-01T18:00","TEN|CIN|0|0|pre|2026-11-01T18:00","ARI|DAL|0|0|pre|2026-11-01T18:00","MIN|DET|0|0|pre|2026-11-01T18:00","LV|NYJ|0|0|pre|2026-11-01T18:00","CLE|PIT|0|0|pre|2026-11-01T18:00","ATL|TB|0|0|pre|2026-11-01T18:00","IND|JAX|0|0|pre|2026-11-01T18:00","LAC|LAR|0|0|pre|2026-11-01T21:05","KC|DEN|0|0|pre|2026-11-01T21:25","NE|MIA|0|0|pre|2026-11-01T21:25","PHI|WSH|0|0|pre|2026-11-02T01:20","CHI|SEA|0|0|pre|2026-11-03T01:15"],["JAX|BAL|0|0|pre|2026-11-06T01:15","CIN|ATL|0|0|pre|2026-11-08T14:30","DAL|IND|0|0|pre|2026-11-08T18:00","NYJ|KC|0|0|pre|2026-11-08T18:00","DET|MIA|0|0|pre|2026-11-08T18:00","CLE|NO|0|0|pre|2026-11-08T18:00","NYG|PHI|0|0|pre|2026-11-08T18:00","LAR|WSH|0|0|pre|2026-11-08T18:00","DEN|CAR|0|0|pre|2026-11-08T18:00","HOU|LAC|0|0|pre|2026-11-08T21:05","LV|SF|0|0|pre|2026-11-08T21:05","GB|NE|0|0|pre|2026-11-08T21:25","ARI|SEA|0|0|pre|2026-11-08T21:25","TB|CHI|0|0|pre|2026-11-09T01:20","BUF|MIN|0|0|pre|2026-11-10T01:15"],["WSH|NYG|0|0|pre|2026-11-13T01:15","NE|DET|0|0|pre|2026-11-15T14:30","KC|ATL|0|0|pre|2026-11-15T18:00","HOU|CLE|0|0|pre|2026-11-15T18:00","MIN|GB|0|0|pre|2026-11-15T18:00","JAX|TEN|0|0|pre|2026-11-15T18:00","MIA|IND|0|0|pre|2026-11-15T18:00","CAR|NO|0|0|pre|2026-11-15T18:00","BUF|NYJ|0|0|pre|2026-11-15T18:00","SEA|LV|0|0|pre|2026-11-15T21:05","LAR|ARI|0|0|pre|2026-11-15T21:05","SF|DAL|0|0|pre|2026-11-15T21:25","PIT|CIN|0|0|pre|2026-11-16T01:20","LAC|BAL|0|0|pre|2026-11-17T01:15"],["IND|HOU|0|0|pre|2026-11-20T01:15","MIA|BUF|0|0|pre|2026-11-22T18:00","NO|CHI|0|0|pre|2026-11-22T18:00","TEN|DAL|0|0|pre|2026-11-22T18:00","TB|DET|0|0|pre|2026-11-22T18:00","ARI|KC|0|0|pre|2026-11-22T18:00","JAX|NYG|0|0|pre|2026-11-22T18:00","BAL|CAR|0|0|pre|2026-11-22T18:00","NYJ|LAC|0|0|pre|2026-11-22T21:05","LV|DEN|0|0|pre|2026-11-22T21:25","PIT|PHI|0|0|pre|2026-11-22T21:25","MIN|SF|0|0|pre|2026-11-23T01:20","CIN|WSH|0|0|pre|2026-11-24T01:15"],["GB|LAR|0|0|pre|2026-11-26T01:00","CHI|DET|0|0|pre|2026-11-26T18:00","PHI|DAL|0|0|pre|2026-11-26T21:30","KC|BUF|0|0|pre|2026-11-27T01:20","DEN|PIT|0|0|pre|2026-11-27T20:00","NO|CIN|0|0|pre|2026-11-29T18:00","LV|CLE|0|0|pre|2026-11-29T18:00","NYG|IND|0|0|pre|2026-11-29T18:00","NYJ|MIA|0|0|pre|2026-11-29T18:00","ATL|MIN|0|0|pre|2026-11-29T18:00","BAL|HOU|0|0|pre|2026-11-29T18:00","TEN|JAX|0|0|pre|2026-11-29T21:05","WSH|ARI|0|0|pre|2026-11-29T21:25","SEA|SF|0|0|pre|2026-11-29T21:25","NE|LAC|0|0|pre|2026-11-30T01:20","CAR|TB|0|0|pre|2026-12-01T01:15"],["KC|LAR|0|0|pre|2026-12-04T01:15","DET|ATL|0|0|pre|2026-12-06T18:00","JAX|CHI|0|0|pre|2026-12-06T18:00","CIN|CLE|0|0|pre|2026-12-06T18:00","WSH|TEN|0|0|pre|2026-12-06T18:00","GB|NO|0|0|pre|2026-12-06T18:00","SF|NYG|0|0|pre|2026-12-06T18:00","LAC|TB|0|0|pre|2026-12-06T18:00","MIA|DEN|0|0|pre|2026-12-06T21:05","PHI|ARI|0|0|pre|2026-12-06T21:05","CAR|MIN|0|0|pre|2026-12-06T21:25","BUF|NE|0|0|pre|2026-12-06T21:25","HOU|PIT|0|0|pre|2026-12-07T01:20","DAL|SEA|0|0|pre|2026-12-08T01:15"],["MIN|NE|0|0|pre|2026-12-11T01:15","ATL|CLE|0|0|pre|2026-12-13T18:00","TEN|DET|0|0|pre|2026-12-13T18:00","CHI|MIA|0|0|pre|2026-12-13T18:00","DEN|NYJ|0|0|pre|2026-12-13T18:00","IND|PHI|0|0|pre|2026-12-13T18:00","HOU|WSH|0|0|pre|2026-12-13T18:00","NO|CAR|0|0|pre|2026-12-13T18:00","TB|BAL|0|0|pre|2026-12-13T18:00","LAC|LV|0|0|pre|2026-12-13T21:05","KC|CIN|0|0|pre|2026-12-13T21:25","LAR|SF|0|0|pre|2026-12-13T21:25","NYG|SEA|0|0|pre|2026-12-13T21:25","BUF|GB|0|0|pre|2026-12-14T01:20","PIT|JAX|0|0|pre|2026-12-15T01:15"],["SF|LAC|0|0|pre|2026-12-18T01:15","SEA|PHI|0|0|pre|2026-12-19T22:00","CHI|BUF|0|0|pre|2026-12-20T01:20","MIA|GB|0|0|pre|2026-12-20T18:00","IND|TEN|0|0|pre|2026-12-20T18:00","CLE|NYG|0|0|pre|2026-12-20T18:00","BAL|PIT|0|0|pre|2026-12-20T18:00","NO|TB|0|0|pre|2026-12-20T18:00","ATL|WSH|0|0|pre|2026-12-20T18:00","CIN|CAR|0|0|pre|2026-12-20T18:00","JAX|HOU|0|0|pre|2026-12-20T18:00","NYJ|ARI|0|0|pre|2026-12-20T21:05","DEN|LV|0|0|pre|2026-12-20T21:25","DAL|LAR|0|0|pre|2026-12-20T21:25","DET|MIN|0|0|pre|2026-12-21T01:20","NE|KC|0|0|pre|2026-12-22T01:15"],["HOU|PHI|0|0|pre|2026-12-25T01:15","GB|CHI|0|0|pre|2026-12-25T18:00","BUF|DEN|0|0|pre|2026-12-25T21:30","LAR|SEA|0|0|pre|2026-12-26T01:15","TB|ATL|0|0|pre|2026-12-27T05:00","CIN|IND|0|0|pre|2026-12-27T05:00","WSH|MIN|0|0|pre|2026-12-27T05:00","CAR|PIT|0|0|pre|2026-12-27T05:00","LAC|MIA|0|0|pre|2026-12-27T18:00","ARI|NO|0|0|pre|2026-12-27T18:00","NE|NYJ|0|0|pre|2026-12-27T18:00","CLE|BAL|0|0|pre|2026-12-27T18:00","TEN|LV|0|0|pre|2026-12-27T21:05","SF|KC|0|0|pre|2026-12-27T21:25","JAX|DAL|0|0|pre|2026-12-28T01:20","NYG|DET|0|0|pre|2026-12-29T01:15"],["BAL|CIN|0|0|pre|2027-01-01T01:15","DEN|NE|0|0|pre|2027-01-03T05:00","KC|LAC|0|0|pre|2027-01-03T05:00","LAR|TB|0|0|pre|2027-01-03T05:00","WSH|JAX|0|0|pre|2027-01-03T05:00","NO|ATL|0|0|pre|2027-01-03T18:00","IND|CLE|0|0|pre|2027-01-03T18:00","NYG|DAL|0|0|pre|2027-01-03T18:00","PIT|TEN|0|0|pre|2027-01-03T18:00","BUF|MIA|0|0|pre|2027-01-03T18:00","MIN|NYJ|0|0|pre|2027-01-03T18:00","SEA|CAR|0|0|pre|2027-01-03T18:00","LV|ARI|0|0|pre|2027-01-03T21:05","DET|CHI|0|0|pre|2027-01-03T21:25","PHI|SF|0|0|pre|2027-01-04T01:20","HOU|GB|0|0|pre|2027-01-05T01:15"],["NYJ|BUF|0|0|pre|2027-01-10T05:00","CLE|CIN|0|0|pre|2027-01-10T05:00","LAC|DEN|0|0|pre|2027-01-10T05:00","DET|GB|0|0|pre|2027-01-10T05:00","JAX|IND|0|0|pre|2027-01-10T05:00","LV|KC|0|0|pre|2027-01-10T05:00","SEA|LAR|0|0|pre|2027-01-10T05:00","CHI|MIN|0|0|pre|2027-01-10T05:00","MIA|NE|0|0|pre|2027-01-10T05:00","TB|NO|0|0|pre|2027-01-10T05:00","PHI|NYG|0|0|pre|2027-01-10T05:00","SF|ARI|0|0|pre|2027-01-10T05:00","DAL|WSH|0|0|pre|2027-01-10T05:00","ATL|CAR|0|0|pre|2027-01-10T05:00","PIT|BAL|0|0|pre|2027-01-10T05:00","TEN|HOU|0|0|pre|2027-01-10T05:00"]],"news":[{"h":"Get ready for Colts-Commanders in London, Falcons-Saints on MNF","d":"","t":"2026-09-29T21:31:29Z","img":"https://espnmedia-cdn.akamaized.net/espn/media/common/2026/0929/dm_260929_nfl_week4promo/dm_260929_nfl_week4promo.jpg","u":"https://www.espn.com/video/clip/_/id/50061571/get-ready-colts-commanders-london-falcons-saints-mnf","type":"Media"},{"h":"Patriots place offensive lineman Greg Van Roten (thigh) on IR","d":"The Patriots placed guard Greg Van Roten on injured reserve Tuesday as the infrastructure around quarterback Drake Maye took another hit.","t":"2026-09-29T21:02:48Z","img":"https://a.espncdn.com/photo/2026/0929/r1723591_1296x729_16-9.jpg","u":"https://www.espn.com/nfl/story/_/id/50061293/patriots-place-offensive-lineman-greg-van-roten-thigh-ir","type":"HeadlineNews"},{"h":"Inside George Kittle's 243-day recovery from torn Achilles","d":"Despite tearing his Achilles in the playoffs, Kittle appears to be back to his normal self. Here's how he won the recovery process.","t":"2026-09-29T20:33:47Z","img":"https://a.espncdn.com/photo/2026/0929/r1723524_2_608x342_16-9.jpg","u":"https://www.espn.com/nfl/story/_/id/50059771/san-francisco-49ers-george-kittle-torn-achilles-recovery","type":"Story"},{"h":"Knockout league pickups: Josh Allen, Justin Jefferson among big names available in Week 4","d":"Tristan H. Cockcroft lists the most common players on eliminated teams and finds how much FAB to spend this week.","t":"2026-09-29T19:55:19Z","img":"https://a.espncdn.com/photo/2026/0929/r1723553_608x342_16-9.jpg","u":"https://www.espn.com/fantasy/football/story/_/id/50052708/espn-nfl-fantasy-football-knockout-league-picks-week-4-strategy-adds","type":"Story"},{"h":"Falcons' Tua Tagovailoa healing, embracing backup QB role","d":"Falcons QB Tua Tagovailoa said he's not 100% recovered from his oblique injury but is embracing his role as backup to Michael Penix Jr.","t":"2026-09-29T18:56:00Z","img":"https://a.espncdn.com/photo/2026/0907/r1712973_1296x729_16-9.jpg","u":"https://www.espn.com/nfl/story/_/id/50060106/falcons-tua-tagovailoa-healing-embracing-backup-qb-role","type":"HeadlineNews"},{"h":"A.J. Hawk wouldn't be shocked if another team signs OBJ","d":"","t":"2026-09-29T18:51:42Z","img":"https://espnmedia-cdn.akamaized.net/espn/media/common/2026/0929/ss_20260929_144045264_3679239/ss_20260929_144045264_3679239.jpg","u":"https://www.espn.com/video/clip/_/id/50060143/aj-hawk-shocked-another-team-signs-obj","type":"Media"}],"mvp":{"prov":"DraftKings","sum":1.4431,"odds":{"3918298":"+260","4361741":"+425","3916387":"+600","3139477":"+800","3915511":"+850","12483":"+2800","4431611":"+5500","4431452":"+8000","4038941":"+10000"}}};
 /* =================================================================== */
 
 const $ = (s) => document.querySelector(s);
@@ -561,6 +575,23 @@ async function loadNews(){
       img: a.images?.[0]?.url || "", u: a.links.web.href, type: a.type
     }));
     if (items.length) NEWS = items.slice(0, 9);
+  } catch (e) {}
+}
+
+/* ---------- MVP odds ---------- */
+const imp = (v) => { const n = parseInt(String(v).replace("+", ""), 10); if (!isFinite(n) || n === 0) return 0; return n < 0 ? -n / (-n + 100) : 100 / (n + 100); };
+let MVP = { ...SNAPSHOT.mvp, live: false };
+async function loadMvp(){
+  try {
+    const r = await fetch(`https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/${CONFIG.season}/futures?lang=en&region=us&limit=100`, { cache: "no-store" });
+    if (!r.ok) return;
+    const j = await r.json();
+    const items = j.items || [];
+    const m = items.find(i => /regular season mvp/i.test(i.name || "")) || items.find(i => /\bmvp\b/i.test(i.name || ""));
+    const f = m?.futures?.[0]; if (!f || !f.books?.length) return;
+    const odds = {}; let sum = 0;
+    f.books.forEach(b => { const id = (b.athlete?.$ref || "").match(/athletes\/(\d+)/)?.[1]; sum += imp(b.value); if (id) odds[id] = b.value; });
+    if (sum > 0) MVP = { prov: f.provider?.name || "", odds, sum, live: true };
   } catch (e) {}
 }
 
@@ -868,19 +899,6 @@ function renderCharts(){
       emphasis: { focus: "series" }
     }))
   }, true);
-  const wk = chart("chWeeks");
-  if (wk) wk.setOption({
-    animationDuration: 1200, animationDelay: i => i * 40,
-    grid: { left: 30, right: 12, top: 34, bottom: 30 },
-    legend: { top: 0, right: 0, textStyle: { color: "#97a5c2", fontFamily: "Barlow" }, itemWidth: 12, itemHeight: 12, icon: "roundRect" },
-    tooltip: { ...TT, trigger: "axis", axisPointer: { type: "shadow" } },
-    xAxis: { type: "category", data: xs, ...AX, splitLine: { show: false } },
-    yAxis: { type: "value", max: CONFIG.maxPts, interval: 1, ...AX },
-    series: P.map((p, i) => ({
-      name: p.name, type: "bar", barMaxWidth: 16, data: R.pts[p.id].slice(0, n), itemStyle: { color: p.color, borderRadius: [4, 4, 0, 0] },
-      markLine: i ? undefined : { symbol: "none", silent: true, data: [{ yAxis: CONFIG.maxPts }], lineStyle: { color: "#ffb81c", type: "solid", width: 1.5 }, label: { formatter: "Max 5", color: "#ffb81c", position: "insideEndTop", fontFamily: "Barlow" } }
-    }))
-  }, true);
   const ga = chart("chGauge");
   if (ga) {
     const rate = P.map(p => {
@@ -888,33 +906,16 @@ function renderCharts(){
       for (let k = 1; k <= W; k++) Object.values(R.weeks[k].per[p.id].results).forEach(r => { if (r === "W") { w++; g++; } else if (r === "L" || r === "T") g++; });
       return g ? Math.round(w / g * 100) : 0;
     });
+    const gr = Math.round(Math.min(105, ga.getWidth() * 0.14)), big = gr > 70;
     ga.setOption({
       series: P.map((p, i) => ({
-        type: "gauge", center: [(17 + i * 33) + "%", "52%"], radius: "44%", startAngle: 220, endAngle: -40, min: 0, max: 100,
-        progress: { show: true, width: 12, roundCap: true, itemStyle: { color: p.color, shadowColor: p.color, shadowBlur: 10 } },
-        axisLine: { roundCap: true, lineStyle: { width: 12, color: [[1, "#1c2945"]] } }, pointer: { show: false }, axisTick: { show: false }, splitLine: { show: false }, axisLabel: { show: false },
-        title: { offsetCenter: [0, "88%"], color: p.color, fontFamily: "Big Shoulders Display", fontWeight: 800, fontSize: 18 },
-        detail: { offsetCenter: [0, "0%"], formatter: "{value}%", color: "#eef2fb", fontFamily: "Big Shoulders Display", fontWeight: 900, fontSize: 30 },
+        type: "gauge", center: [(17 + i * 33) + "%", "50%"], radius: gr, startAngle: 220, endAngle: -40, min: 0, max: 100,
+        progress: { show: true, width: big ? 12 : 8, roundCap: true, itemStyle: { color: p.color, shadowColor: p.color, shadowBlur: 10 } },
+        axisLine: { roundCap: true, lineStyle: { width: big ? 12 : 8, color: [[1, "#1c2945"]] } }, pointer: { show: false }, axisTick: { show: false }, splitLine: { show: false }, axisLabel: { show: false },
+        title: { offsetCenter: [0, "92%"], color: p.color, fontFamily: "Big Shoulders Display", fontWeight: 800, fontSize: big ? 18 : 14 },
+        detail: { offsetCenter: [0, "0%"], formatter: "{value}%", color: "#eef2fb", fontFamily: "Big Shoulders Display", fontWeight: 900, fontSize: big ? 30 : 20 },
         data: [{ value: rate[i], name: p.name }], animationDuration: 1600
       }))
-    }, true);
-  }
-  const tw = chart("chTeams");
-  if (tw) {
-    const rows = [];
-    P.forEach(p => Object.entries(R.teamWins[p.id]).forEach(([t, n]) => rows.push({ t, n, p })));
-    rows.sort((a, b) => a.n - b.n || tName(b.t).localeCompare(tName(a.t)));
-    const el = document.getElementById("chTeams");
-    const h = Math.max(220, rows.length * 24 + 40);
-    if (el.style.height !== h + "px") { el.style.height = h + "px"; tw.resize(); }
-    tw.setOption({
-      animationDuration: 1300, animationDelay: i => i * 30,
-      grid: { left: 110, right: 40, top: 6, bottom: 20 },
-      tooltip: { ...TT, trigger: "item", formatter: q => `${esc(tFull(rows[q.dataIndex].t))}<br>${esc(rows[q.dataIndex].p.name)} : ${q.value} victoire${q.value > 1 ? "s" : ""}` },
-      xAxis: { type: "value", minInterval: 1, ...AX },
-      yAxis: { type: "category", data: rows.map(r => tName(r.t)), ...AX, splitLine: { show: false } },
-      series: [{ type: "bar", barMaxWidth: 16, data: rows.map(r => ({ value: r.n, itemStyle: { color: r.p.color, borderRadius: [0, 5, 5, 0] } })),
-        label: { show: true, position: "right", color: "#eef2fb", fontFamily: "Big Shoulders Display", fontWeight: 800, fontSize: 14 } }]
     }, true);
   }
 }
@@ -952,7 +953,18 @@ function renderBets(){
   $("#worst").innerHTML = list.sort((a, b) => a.pct - b.pct).map(x => `<div class="wt ${any && x.pct === worstPct ? "lead" : ""}" style="--pc:${x.p.color}">
     ${logo(x.t, "lg")}<div class="wt-name"><small>${esc(x.p.name)}</small><strong>${esc(tFull(x.t))}</strong>${any && x.pct === worstPct ? `<span class="help">Pour l'instant, ${esc(x.p.name)} ramasse 10 $ de chacun.</span>` : ""}</div>
     <span class="wt-rec">${x.r.w}-${x.r.l}${x.r.t ? "-" + x.r.t : ""}</span></div>`).join("");
-  $("#mvp").innerHTML = P.map(p => `<div style="--pc:${p.color}"><strong>${esc(p.name)}</strong>${CONFIG.bets.mvp[p.id].map(n => `<span>${esc(n)}</span>`).join("")}</div>`).join("");
+  const pct = (x) => x > 0 && x < .01 ? "<1 %" : Math.round(x * 100) + " %";
+  const rows = P.map(p => {
+    const picks = CONFIG.bets.mvp[p.id].map(q => { const o = MVP.odds[q.id]; return { ...q, o, pr: o ? imp(o) / MVP.sum : 0 }; }).sort((a, b) => b.pr - a.pr);
+    return { p, picks, tot: picks.reduce((s, x) => s + x.pr, 0) };
+  }).sort((a, b) => b.tot - a.tot);
+  const top = rows[0].tot || 1;
+  $("#mvp").innerHTML = `<p class="mvp-lead">Selon les cotes, <b style="color:${rows[0].p.color}">${esc(rows[0].p.name)}</b> est le favori pour ramasser les 20 $.</p>` +
+    rows.map((r, i) => `<div class="mo ${i === 0 ? "lead" : ""}" style="--pc:${r.p.color}">
+      <div class="mo-head"><strong>${esc(r.p.name)}</strong><span class="mo-pct">${pct(r.tot)}</span></div>
+      <div class="mo-bar" aria-hidden="true"><i style="width:${(r.tot / top * 100).toFixed(1)}%"></i></div>
+      <ul>${r.picks.map(q => `<li><span>${esc(q.name)}</span><span class="num">${q.o ? esc(q.o) + " · " + pct(q.pr) : "hors marché"}</span></li>`).join("")}</ul></div>`).join("");
+  $("#mvpSrc").textContent = `Pourcentage : chance que le MVP soit un de ses 3 choix, selon les cotes ${MVP.prov || ""} (via ESPN)${MVP.live ? ", mises à jour automatiquement" : ", dernières cotes connues"}.`;
 }
 
 /* ---------- Render: news ---------- */
@@ -988,7 +1000,7 @@ function refreshForm(){
   const wk = R.weeks[w], pr = wk.per[pid];
   $("#fInWrap").hidden = KIND !== "trade";
   $("#fTeamLbl").textContent = KIND === "drop" ? "Équipe droppée" : KIND === "trade" ? "Équipe qui part" : "Équipe ajoutée";
-  let help = "";
+  let help = "", lock8 = false;
   if (KIND === "drop") {
     const opts = pr.roster.filter(t => wk.gameOf[t] && !pr.drops.includes(t));
     fillSelect($("#fTeam"), opts.map(t => [t, tFull(t)]), true);
@@ -1004,10 +1016,13 @@ function refreshForm(){
   } else {
     fillSelect($("#fTeam"), freeTeams(w).map(t => [t, tFull(t)]), true);
     const has8 = rosterAt(pid, W, DATA.entries).length > PB[pid].teams.length;
+    const gap = R.standings.find(s => s.p.id === pid).gap;
     help = has8 ? `${PB[pid].name} a déjà une 8<sup>e</sup> équipe.` :
-      R.catchUp[pid] ? `${PB[pid].name} est en rattrapage (−7 ou pire) : il peut ajouter une 8<sup>e</sup> équipe jusqu'à la fin.` :
-      `Réservé au joueur à −7 ou pire à partir de la semaine 6. ${PB[pid].name} n'y a pas droit pour l'instant.`;
+      R.catchUp[pid] ? `${PB[pid].name} est à <b>${gap}</b> : il peut ajouter une 8<sup>e</sup> équipe, qu'il garde jusqu'à la fin de la saison.` :
+      `Débloqué quand un joueur est à <b>−7 ou pire</b>, à partir de la semaine ${CONFIG.catchUp.fromWeek}. ${PB[pid].name} est à ${gap === 0 ? "égalité avec le meneur" : gap}${R.cur < CONFIG.catchUp.fromWeek ? ` (on est à la semaine ${R.cur})` : ""}.`;
+    lock8 = has8 || !R.catchUp[pid];
   }
+  $("#saveBtn").disabled = KIND === "add" && lock8;
   $("#fHelp").innerHTML = help;
   $("#formSet").disabled = !unlocked();
 }
@@ -1020,10 +1035,6 @@ function renderManage(){
   $("#setupBox").hidden = !GH.on || (!GH.keyMissing && !GH.token);
   $("#setupSum").textContent = GH.keyMissing ? "Activer la sauvegarde en ligne (une seule fois)" : "Changer le code du pool";
   if (GH.keyMissing) $("#setupBox").open = true;
-  // 8e équipe : visible seulement si un joueur est en rattrapage (ou en a déjà une)
-  const show8 = P.some(p => R.catchUp[p.id] || rosterAt(p.id, W, DATA.entries).length > p.teams.length);
-  $("#tabAdd").hidden = !show8;
-  if (!show8 && KIND === "add") { KIND = "drop"; document.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-selected", String(x.dataset.kind === "drop"))); }
   refreshForm();
   // history
   const items = [...DATA.entries].sort((a, b) => String(b.at).localeCompare(String(a.at)));
@@ -1055,6 +1066,7 @@ async function onSave(){
     entry = { type: "trade", week: w, player: pid, team, teamIn: tin, ...(free ? { free: true } : {}) }; msg = `${p.name} échange ${tFull(team)} contre ${tFull(tin)} (dès la semaine ${w})`;
   } else {
     if (rosterAt(pid, W, DATA.entries).length > PB[pid].teams.length) return toast(`${p.name} a déjà une 8e équipe.`, true);
+    if (!R.catchUp[pid]) return toast(`La 8e équipe se débloque seulement à −7 ou pire, à partir de la semaine ${CONFIG.catchUp.fromWeek}.`, true);
     entry = { type: "add", week: w, player: pid, team }; msg = `${p.name} ajoute ${tFull(team)} (dès la semaine ${w})`;
   }
   entry.id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
@@ -1068,7 +1080,7 @@ async function onSave(){
     toast("Enregistré : " + msg);
     rerender();
   } catch (e) { toast(e.message.startsWith("GitHub") ? "La sauvegarde a échoué (" + e.message + "). Vérifie la connexion et réessaie." : e.message, true); }
-  finally { $("#saveBtn").disabled = false; }
+  finally { $("#saveBtn").disabled = false; refreshForm(); }
 }
 async function onDelete(id){
   const e = DATA.entries.find(x => x.id === id); if (!e) return;
@@ -1143,7 +1155,7 @@ function init(){
   boot();
 }
 async function boot(){
-  await Promise.all([loadSchedule(), loadNews(), loadData()]);
+  await Promise.all([loadSchedule(), loadNews(), loadData(), loadMvp()]);
   if (GH.on) {
     const saved = ls.get(KEY("code"));
     if (saved) await tryUnlock(saved, true);
@@ -1164,7 +1176,7 @@ function schedule(){
   schedule.t = setTimeout(async () => {
     if (document.visibilityState === "visible") {
       await loadSchedule([R.cur, Math.min(W, R.cur + 1)]);
-      if (Date.now() - (schedule.lastData || 0) > 4 * 60e3) { await Promise.all([loadData(), loadNews()]); schedule.lastData = Date.now(); }
+      if (Date.now() - (schedule.lastData || 0) > 4 * 60e3) { await Promise.all([loadData(), loadNews(), loadMvp()]); schedule.lastData = Date.now(); }
       rerender();
     }
     schedule();
