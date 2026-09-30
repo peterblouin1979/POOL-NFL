@@ -792,7 +792,7 @@ function renderWeek(){
   else {
     const before = wk.firstKick > Date.now();
     const lastKick = new Date(Math.max(...wk.games.map(g => +g.date)));
-    const range = `Matchs du ${fmtRange.format(wk.firstKick)} au ${fmtRange.format(lastKick)}. `;
+    const range = `Matchs du ${fmtRange.format(wk.firstKick)} au ${fmtRange.format(lastKick)} · `;
     const head = range + (before ? `Premier match : <b>${esc(fmtWhen.format(wk.firstKick))}</b> (dans ${until(wk.firstKick)}).` :
       wk.state === "final" ? `Semaine terminée.` : `Semaine en cours.`);
     if (!needs.length) html = `<div class="notice calm"><div>${head} Aucun drop cette semaine : personne n'a d'équipe en bye.</div></div>`;
