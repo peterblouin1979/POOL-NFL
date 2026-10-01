@@ -34,8 +34,8 @@ body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 var(--body
   background-repeat:no-repeat}
 /* Arrière-plan : terrain de football vu d'en haut, fixe derrière le contenu, assombri pour la lisibilité */
 body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
-  background:linear-gradient(180deg,rgba(6,10,18,.72) 0%,rgba(6,10,18,.5) 35%,rgba(6,10,18,.62) 70%,rgba(6,10,18,.85) 100%),url("fond-test.jpg") 68% center/cover no-repeat}
-@media (max-width:640px){body::before{background:linear-gradient(180deg,rgba(6,10,18,.74) 0%,rgba(6,10,18,.62) 40%,rgba(6,10,18,.86) 100%),url("fond-test.jpg") 70% center/cover no-repeat}}
+  background:linear-gradient(180deg,rgba(6,10,18,.8) 0%,rgba(6,10,18,.66) 35%,rgba(6,10,18,.72) 70%,rgba(6,10,18,.88) 100%),url("fond-terrain.jpg") center/cover no-repeat}
+@media (max-width:640px){body::before{background:linear-gradient(180deg,rgba(6,10,18,.8) 0%,rgba(6,10,18,.7) 40%,rgba(6,10,18,.88) 100%),url("fond-terrain.jpg") 45% center/cover no-repeat}}
 a{color:inherit}
 button,input,select{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--amber);outline-offset:2px}
