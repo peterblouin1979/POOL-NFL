@@ -245,9 +245,22 @@ section.block{display:grid;gap:18px;padding-block:44px 8px;min-width:0}
 .field label{font-size:.76rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:600}
 .field input,.field select{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--line-2);background:var(--bg-2)}
 .check{display:flex;gap:8px;align-items:center;font-size:.88rem;color:var(--muted)}
-.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;align-items:flex-start}
 .tabs button{appearance:none;border:1px solid var(--line-2);background:transparent;color:var(--muted);border-radius:999px;padding:7px 14px;font-weight:600;cursor:pointer}
 .tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tab-w{display:inline-flex;flex-direction:column;align-items:center;gap:3px}
+.tab-w small{font-size:.68rem;color:var(--amber);font-weight:600;white-space:nowrap}
+/* Photo « Lâche pas mon Steve » : 5 secondes quand on clique sur 8e équipe */
+.steve{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:16px;background:rgba(4,7,12,.82);backdrop-filter:blur(4px);cursor:pointer;animation:stFade .25s ease-out}
+.steve-in{position:relative;margin:0;max-width:min(560px,100%);border-radius:16px;overflow:hidden;box-shadow:0 30px 90px rgba(0,0,0,.7),0 0 0 3px var(--amber);animation:stPop .45s cubic-bezier(.2,1.4,.4,1)}
+.steve-in img{display:block;width:100%;max-height:82vh;object-fit:cover}
+.steve-in figcaption{position:absolute;left:0;right:0;top:4%;padding:0 6%;text-align:center;font:900 clamp(2.4rem,11vw,4.6rem)/.92 var(--display);text-transform:uppercase;letter-spacing:.01em;color:#fff;
+  -webkit-text-stroke:2px #000;paint-order:stroke fill;text-shadow:0 4px 0 #000,0 0 18px rgba(0,0,0,.6);transform:rotate(-3deg);animation:stShout .6s .2s cubic-bezier(.2,1.6,.4,1) both}
+.steve-bar{position:absolute;left:0;bottom:0;height:6px;width:100%;background:var(--amber);transform-origin:left;animation:stTime 5s linear forwards}
+@keyframes stFade{from{opacity:0}}
+@keyframes stPop{from{transform:scale(.7);opacity:0}}
+@keyframes stShout{from{transform:rotate(-3deg) scale(1.8);opacity:0}}
+@keyframes stTime{to{transform:scaleX(0)}}
 .help{font-size:.85rem;color:var(--muted);margin:0}
 .help b{color:var(--ink)}
 fieldset{border:0;padding:0;margin:0;display:grid;gap:12px;min-width:0}
@@ -361,7 +374,7 @@ footer .wrap{display:grid;gap:6px;border-top:1px solid var(--line);padding-top:1
         <div class="tabs" role="tablist" aria-label="Type d'entrée">
           <button role="tab" id="tabDrop" aria-selected="true" data-kind="drop">Drop</button>
           <button role="tab" id="tabTrade" aria-selected="false" data-kind="trade">Échange</button>
-          <button role="tab" id="tabAdd" aria-selected="false" data-kind="add">8<sup>e</sup> équipe</button>
+          <span class="tab-w" role="presentation"><button role="tab" id="tabAdd" aria-selected="false" data-kind="add">8<sup>e</sup> équipe</button><small>(Pour Steve seulement)</small></span>
         </div>
         <fieldset id="formSet">
           <div class="row">
@@ -422,6 +435,14 @@ footer .wrap{display:grid;gap:6px;border-top:1px solid var(--line);padding-top:1
     <div class="honours" id="honours"></div>
   </section>
 </main>
+
+<div class="steve" id="steve" hidden role="dialog" aria-label="Lâche pas mon Steve">
+  <figure class="steve-in">
+    <img src="steve.jpg" alt="Photo souvenir">
+    <figcaption>Lâche pas mon Steve</figcaption>
+    <span class="steve-bar"></span>
+  </figure>
+</div>
 
 <footer><div class="wrap">
   <span>Résultats, calendrier et nouvelles : ESPN. Les pointages se mettent à jour chaque minute pendant les matchs.</span>
@@ -1076,13 +1097,23 @@ function rerender(){
   if (VIEW_W == null) VIEW_W = R.cur;
   renderStatus(); renderHero(); renderWeek(); renderHeat(); renderBets(); renderNews(); renderHonours(); renderManage();
 }
+// Lâche pas mon Steve : la photo s'affiche 5 secondes
+function showSteve(){
+  const el = $("#steve"); clearTimeout(showSteve.t);
+  el.hidden = true; void el.offsetWidth; el.hidden = false; // relance les animations à chaque clic
+  showSteve.t = setTimeout(hideSteve, 5000);
+}
+function hideSteve(){ clearTimeout(showSteve.t); $("#steve").hidden = true; }
 function init(){
   fillSelect($("#fPlayer"), P.map(p => [p.id, p.name]));
   $("#wkPrev").onclick = () => { VIEW_W = Math.max(1, VIEW_W - 1); renderWeek(); };
   $("#wkNext").onclick = () => { VIEW_W = Math.min(W, VIEW_W + 1); renderWeek(); };
   document.querySelectorAll(".tabs button").forEach(b => b.onclick = () => {
     KIND = b.dataset.kind; document.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-selected", String(x === b))); refreshForm();
+    if (KIND === "add") showSteve();
   });
+  $("#steve").onclick = hideSteve;
+  document.addEventListener("keydown", (ev) => { if (ev.key === "Escape") hideSteve(); });
   $("#fWeek").onchange = refreshForm; $("#fPlayer").onchange = refreshForm;
   $("#saveBtn").onclick = onSave;
   $("#hist").onclick = (ev) => { const b = ev.target.closest("[data-del]"); if (b) onDelete(b.dataset.del); };
