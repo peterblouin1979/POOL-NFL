@@ -180,7 +180,10 @@ section.block{display:grid;gap:18px;padding-block:44px 8px;min-width:0}
 .heat td.drop{background:repeating-linear-gradient(135deg,var(--bg-2) 0 5px,var(--line) 5px 7px);color:var(--muted);text-decoration:line-through}
 .heat td.inup{background:var(--win-soft);color:var(--win);outline:1px solid var(--live)}
 .heat td.indn{background:var(--loss-soft);color:#ff8f93;outline:1px solid var(--live)}
-.heat td.pre{font-weight:500;font-size:.68rem}
+.heat td.pre{font-weight:500;font-size:.68rem;line-height:1.1}
+.heat td.pre small{display:block;font-size:.58rem;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+.heat td.pre small.lo{color:#5fd39a}
+.heat td.pre small.hi{color:#ff8f93}
 .heat td.na{background:transparent}
 .heat td.sum{background:transparent;color:var(--ink);font:800 1rem var(--display)}
 .heat tr.cur-col td:nth-child(n){}
@@ -313,7 +316,6 @@ footer .wrap{display:grid;gap:6px;border-top:1px solid var(--line);padding-top:1
       <p class="sub" id="heroSub">Une victoire de tes équipes = 1 point, maximum 5 par semaine. Tout se calcule tout seul à partir des résultats officiels.</p>
     </div>
     <div class="board" id="board"></div>
-    <div class="facts" id="facts"></div>
   </div>
 </header>
 
@@ -802,25 +804,6 @@ function renderHero(){
       </dl>${liveNote}
     </article>`;
   }).join("");
-  // facts
-  const facts = [];
-  const played = R.lastPlayed;
-  if (played) {
-    const perfect = P.map(p => ({ p, n: R.pts[p.id].filter(v => v === CONFIG.maxPts).length })).sort((a, b) => b.n - a.n);
-    if (perfect[0].n) facts.push(["Semaines parfaites (5 pts)", perfect.filter(x => x.n).map(x => `${x.p.name} ×${x.n}`).join(" · ")]);
-    let best = null;
-    P.forEach(p => Object.entries(R.teamWins[p.id]).forEach(([t, n]) => { if (!best || n > best.n) best = { t, n, p }; }));
-    if (best) { const rc = R.rec[best.t]; facts.push(["Équipe la plus payante", `${tName(best.t)} ${rc.w}-${rc.l}${rc.t ? "-" + rc.t : ""} · ${best.p.name}`]); }
-    let bestWeek = null;
-    for (let w = 1; w <= played; w++) {
-      const vals = P.map(p => R.pts[p.id][w - 1] ?? 0);
-      const spread = Math.max(...vals) - Math.min(...vals);
-      const hi = Math.max(...vals);
-      if (!bestWeek || spread > bestWeek.spread) bestWeek = { w, spread, who: P.filter((p, i) => vals[i] === hi).map(p => p.name).join(" et ") };
-    }
-    if (bestWeek && bestWeek.spread) facts.push(["Plus grosse raclée", `Semaine ${bestWeek.w} · ${bestWeek.who} (+${bestWeek.spread})`]);
-  }
-  $("#facts").innerHTML = facts.map(([k, v]) => `<div class="fact"><span class="eyebrow">${esc(k)}</span><b>${esc(v)}</b></div>`).join("");
 }
 
 /* ---------- Render: week ---------- */
@@ -917,6 +900,14 @@ function renderHeat(){
         const opp = g ? (g.away.t === t ? "@" + g.home.t : g.away.t) : "";
         const map = { W: ["w", "V"], L: ["l", "D"], T: ["t", "N"], BYE: ["bye", "bye"], DROP: ["drop", opp.replace("@", "")], "IN+": ["inup", "▲"], "IN-": ["indn", "▼"], "IN=": ["inup", "="], PRE: ["pre", opp] };
         const [c, txt] = map[r] || ["", ""];
+        // matchs à venir : fiche actuelle de l'adversaire sous son nom (vert = adversaire perdant, rouge = gagnant)
+        if (r === "PRE" && g) {
+          const ot = g.away.t === t ? g.home.t : g.away.t, rc = R.rec[ot] || { w: 0, l: 0, t: 0 };
+          const rtxt = `${rc.w}-${rc.l}${rc.t ? "-" + rc.t : ""}`, n = rc.w + rc.l + rc.t, pct = n ? (rc.w + rc.t / 2) / n : .5;
+          const tone = !n ? "" : pct > .5 ? "hi" : pct < .5 ? "lo" : "";
+          h += `<td class="pre" title="${esc(tName(t))} · semaine ${w} · ${esc(opp)} · fiche des ${esc(tName(ot))} : ${rtxt}">${esc(opp)}<small class="${tone}">${rtxt}</small></td>`;
+          continue;
+        }
         h += `<td class="${c}" title="${esc(tName(t))} · semaine ${w}${opp ? " · " + opp : ""}">${esc(txt)}</td>`;
       }
       h += `<td class="sum">${R.teamWins[p.id][t] || 0}</td></tr>`;
