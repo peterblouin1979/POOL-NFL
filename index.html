@@ -141,6 +141,7 @@ section.block{display:grid;gap:18px;padding-block:44px 8px;min-width:0}
 .g-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:8px;align-items:center}
 .g-name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .g-row.lose .g-name,.g-row.lose .g-sc{color:var(--faint)}
+.g-rec{font-size:.78em;font-weight:500;color:var(--muted);margin-left:6px;font-variant-numeric:tabular-nums;letter-spacing:.02em}
 .g-row.win .g-sc{color:var(--ink)}
 .g-sc{font:800 1.3rem/1 var(--display);min-width:2ch;text-align:right;font-variant-numeric:tabular-nums}
 .own{font:700 .68rem/1 var(--body);text-transform:uppercase;letter-spacing:.06em;padding:4px 7px;border-radius:999px;color:var(--pc);background:color-mix(in srgb,var(--pc) 16%,transparent);white-space:nowrap}
@@ -876,13 +877,24 @@ function renderWeek(){
   const groups = [];
   games.forEach(g => { const k = fmtDay.format(g.date); let gr = groups.find(x => x.k === k); if (!gr) groups.push(gr = { k, list: [] }); gr.list.push(g); });
   const owners = ownersAt(w, DATA.entries);
+  // fiche V-D de chaque équipe jusqu'à cette semaine inclusivement
+  const recs = {};
+  for (let x = 1; x <= w; x++) (WEEKS[x] || []).forEach(g => {
+    if (g.state !== "post") return;
+    for (const [me, op] of [[g.away, g.home], [g.home, g.away]]) {
+      const r = recs[me.t] || (recs[me.t] = { w: 0, l: 0, t: 0 });
+      if (me.win) r.w++; else if (op.win) r.l++; else r.t++;
+    }
+  });
+  wk.games.forEach(g => [g.away.t, g.home.t].forEach(t => { if (!recs[t]) recs[t] = { w: 0, l: 0, t: 0 }; }));
   $("#days").innerHTML = groups.map(gr => `<div class="day"><h3>${esc(cap(gr.k))}</h3><div class="games">${gr.list.map(g => {
     const duel = owners[g.away.t] && owners[g.home.t] && owners[g.away.t] !== owners[g.home.t];
     const meta = g.state === "in" ? `<span class="lv">${esc(g.detail || "En cours")}</span>` :
       g.state === "post" ? "<span>Final</span>" : g.state === "off" ? "<span>Reporté</span>" : `<span>${esc(fmtTime.format(g.date))}</span>`;
     const row = (me, op) => {
       const cls = g.state === "post" ? (me.win ? "win" : op.win ? "lose" : "") : "";
-      return `<div class="g-row ${cls}">${logo(me.t)}<span class="g-name">${esc(tName(me.t))}</span>${ownerChip(me.t, wk)}<span class="g-sc">${g.state === "pre" ? "" : me.s}</span></div>`;
+      const rc = recs[me.t], rtxt = rc ? `${rc.w}-${rc.l}${rc.t ? "-" + rc.t : ""}` : "";
+      return `<div class="g-row ${cls}">${logo(me.t)}<span class="g-name">${esc(tName(me.t))}${rtxt ? ` <small class="g-rec" title="Fiche victoires-défaites">${rtxt}</small>` : ""}</span>${ownerChip(me.t, wk)}<span class="g-sc">${g.state === "pre" ? "" : me.s}</span></div>`;
     };
     return `<div class="game ${g.state === "in" ? "in" : ""} ${duel ? "duel" : ""}"><div class="g-meta">${meta}<span>${duel ? "Duel du pool" : esc(g.tv)}</span></div>${row(g.away, g.home)}${row(g.home, g.away)}</div>`;
   }).join("")}</div></div>`).join("");
