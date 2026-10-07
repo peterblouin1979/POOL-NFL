@@ -1,3 +1,12 @@
 {
-  "entries": []
+  "entries": [
+    {
+      "type": "drop",
+      "week": 5,
+      "player": "steve",
+      "team": "TB",
+      "id": "muyd0os3k08d",
+      "at": "2026-10-07T17:06:37.299Z"
+    }
+  ]
 }
