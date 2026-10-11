@@ -150,6 +150,9 @@ section.block{display:grid;gap:18px;padding-block:44px 8px;min-width:0}
 .odds-help .dot.g{background:#5fd39a} .odds-help .dot.o{background:var(--amber)} .odds-help .dot.r{background:#ff8f93}
 .days{display:grid;gap:18px}
 .day h3{font:800 1.1rem/1 var(--display);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:10px}
+.day.live h3{color:var(--live);display:flex;align-items:center;gap:8px}
+.day h3 .dotlive{width:9px;height:9px;border-radius:50%;background:var(--live);animation:pulse 1.6s infinite}
+.day.done h3 small{font:700 .8rem var(--body);color:var(--faint);margin-left:6px;letter-spacing:0}
 .games{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px}
 .game{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:grid;gap:6px}
 .game.duel{border-color:var(--line-2);background:linear-gradient(135deg,var(--panel-2),var(--panel))}
@@ -590,7 +593,8 @@ function gameFromEspn(e, w){
   const lp = c.situation?.lastPlay?.probability;
   const pLive = lp && isFinite(+lp.homeWinPercentage) ? +lp.homeWinPercentage : null;
   return { id: e.id, week: w, date: new Date(e.date), state: st, detail: e.status?.type?.shortDetail || "",
-    tv: (c.broadcasts?.[0]?.names || []).join(", "), away: side(A), home: side(H), pHome, pLive };
+    tv: (c.broadcasts?.[0]?.names || []).join(", "), away: side(A), home: side(H), pHome, pLive,
+    period: +e.status?.period || 0, clock: isFinite(+e.status?.clock) ? +e.status.clock : null };
 }
 const revive = (g) => ({ ...g, date: new Date(g.date) });
 function snapshotWeeks(){
@@ -910,9 +914,23 @@ function renderWeek(){
     </div>`;
   }).join("");
   // games grouped by day
-  const games = [...wk.games].sort((a, b) => a.date - b.date);
+  // En cours en haut (le moins de temps restant d'abord), puis à venir par jour, et les matchs terminés en bas
+  const left = (g) => {
+    let per = g.period, clk = g.clock;
+    if (!per || clk == null) { // anciennes données : on lit « 1:22 - 4th », « Halftime », « End of 3rd »
+      const d = String(g.detail || ""), m = d.match(/(\d+):(\d+)\s*-\s*(\d)/), e = d.match(/End of (\d)/i);
+      if (m) { per = +m[3]; clk = +m[1] * 60 + +m[2]; } else if (e) { per = +e[1]; clk = 0; } else if (/half/i.test(d)) { per = 2; clk = 0; } else if (/OT/i.test(d)) { per = 5; clk = 300; }
+    }
+    if (!per) return 3600;
+    return per >= 5 ? (clk ?? 600) : (4 - per) * 900 + (clk ?? 900);
+  };
+  const live = wk.games.filter(g => g.state === "in").sort((a, b) => left(a) - left(b) || a.date - b.date);
+  const upcoming = wk.games.filter(g => g.state === "pre").sort((a, b) => a.date - b.date);
+  const done = wk.games.filter(g => g.state === "post" || g.state === "off").sort((a, b) => b.date - a.date);
   const groups = [];
-  games.forEach(g => { const k = fmtDay.format(g.date); let gr = groups.find(x => x.k === k); if (!gr) groups.push(gr = { k, list: [] }); gr.list.push(g); });
+  if (live.length) groups.push({ k: "En cours", cls: "live", list: live });
+  upcoming.forEach(g => { const k = fmtDay.format(g.date); let gr = groups.find(x => x.k === k && !x.cls); if (!gr) groups.push(gr = { k, list: [] }); gr.list.push(g); });
+  if (done.length) groups.push({ k: "Terminés", cls: "done", list: done });
   const owners = ownersAt(w, DATA.entries);
   // fiche V-D de chaque équipe jusqu'à cette semaine inclusivement
   const recs = {};
@@ -924,7 +942,7 @@ function renderWeek(){
     }
   });
   wk.games.forEach(g => [g.away.t, g.home.t].forEach(t => { if (!recs[t]) recs[t] = { w: 0, l: 0, t: 0 }; }));
-  $("#days").innerHTML = groups.map(gr => `<div class="day"><h3>${esc(cap(gr.k))}</h3><div class="games">${gr.list.map(g => {
+  $("#days").innerHTML = groups.map(gr => `<div class="day ${gr.cls || ""}"><h3>${gr.cls === "live" ? '<span class="dotlive"></span>' : ""}${esc(cap(gr.k))}${gr.cls === "done" ? ` <small>${gr.list.length}</small>` : ""}</h3><div class="games">${gr.list.map(g => {
     const duel = owners[g.away.t] && owners[g.home.t] && owners[g.away.t] !== owners[g.home.t];
     const meta = g.state === "in" ? `<span class="lv">${esc(g.detail || "En cours")}</span>` :
       g.state === "post" ? "<span>Final</span>" : g.state === "off" ? "<span>Reporté</span>" : `<span>${esc(fmtTime.format(g.date))}</span>`;
