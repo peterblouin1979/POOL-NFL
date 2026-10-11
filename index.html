@@ -846,7 +846,7 @@ function renderHero(){
 }
 
 /* ---------- Render: week ---------- */
-let VIEW_W = null;
+let VIEW_W = null, VIEW_AUTO = true; // la vue suit la semaine en cours tant qu'on ne change pas de semaine soi-même
 function ownerChip(t, wk){
   const o = ownersAt(wk.w, DATA.entries)[t];
   if (!o) return "";
@@ -1182,7 +1182,7 @@ async function onSetup(){
 /* ---------- Wiring ---------- */
 function rerender(){
   compute();
-  if (VIEW_W == null) VIEW_W = R.cur;
+  if (VIEW_AUTO || VIEW_W == null) VIEW_W = R.cur;
   renderStatus(); renderHero(); renderWeek(); renderHeat(); renderBets(); renderNews(); renderHonours(); renderManage();
 }
 // Lâche pas mon Steve : la photo s'affiche 5 secondes
@@ -1194,8 +1194,8 @@ function showSteve(){
 function hideSteve(){ clearTimeout(showSteve.t); $("#steve").hidden = true; }
 function init(){
   fillSelect($("#fPlayer"), P.map(p => [p.id, p.name]));
-  $("#wkPrev").onclick = () => { VIEW_W = Math.max(1, VIEW_W - 1); renderWeek(); };
-  $("#wkNext").onclick = () => { VIEW_W = Math.min(W, VIEW_W + 1); renderWeek(); };
+  $("#wkPrev").onclick = () => { VIEW_W = Math.max(1, VIEW_W - 1); VIEW_AUTO = VIEW_W === R.cur; renderWeek(); };
+  $("#wkNext").onclick = () => { VIEW_W = Math.min(W, VIEW_W + 1); VIEW_AUTO = VIEW_W === R.cur; renderWeek(); };
   document.querySelectorAll(".tabs button").forEach(b => b.onclick = () => {
     KIND = b.dataset.kind; document.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-selected", String(x === b))); refreshForm();
     if (KIND === "add") showSteve();
@@ -1225,9 +1225,7 @@ async function boot(){
     if (saved) await tryUnlock(saved, true);
     else { try { const f = await GH.read(CONFIG.github.keyPath, false); GH.keyMissing = !!f.missing; } catch (e) {} }
   }
-  const before = R.cur;
   compute();
-  if (VIEW_W === before) VIEW_W = R.cur;
   $("#fWeek").value = String(R.cur);
   rerender();
   schedule();
