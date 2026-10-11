@@ -846,7 +846,7 @@ function renderHero(){
 }
 
 /* ---------- Render: week ---------- */
-let VIEW_W = null, VIEW_AUTO = true; // la vue suit la semaine en cours tant qu'on ne change pas de semaine soi-même
+let VIEW_W = null;
 function ownerChip(t, wk){
   const o = ownersAt(wk.w, DATA.entries)[t];
   if (!o) return "";
@@ -1182,7 +1182,7 @@ async function onSetup(){
 /* ---------- Wiring ---------- */
 function rerender(){
   compute();
-  if (VIEW_AUTO || VIEW_W == null) VIEW_W = R.cur;
+  if (VIEW_W == null) VIEW_W = R.cur;
   renderStatus(); renderHero(); renderWeek(); renderHeat(); renderBets(); renderNews(); renderHonours(); renderManage();
 }
 // Lâche pas mon Steve : la photo s'affiche 5 secondes
@@ -1194,8 +1194,8 @@ function showSteve(){
 function hideSteve(){ clearTimeout(showSteve.t); $("#steve").hidden = true; }
 function init(){
   fillSelect($("#fPlayer"), P.map(p => [p.id, p.name]));
-  $("#wkPrev").onclick = () => { VIEW_W = Math.max(1, VIEW_W - 1); VIEW_AUTO = VIEW_W === R.cur; renderWeek(); };
-  $("#wkNext").onclick = () => { VIEW_W = Math.min(W, VIEW_W + 1); VIEW_AUTO = VIEW_W === R.cur; renderWeek(); };
+  $("#wkPrev").onclick = () => { VIEW_W = Math.max(1, VIEW_W - 1); renderWeek(); };
+  $("#wkNext").onclick = () => { VIEW_W = Math.min(W, VIEW_W + 1); renderWeek(); };
   document.querySelectorAll(".tabs button").forEach(b => b.onclick = () => {
     KIND = b.dataset.kind; document.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-selected", String(x === b))); refreshForm();
     if (KIND === "add") showSteve();
@@ -1225,7 +1225,9 @@ async function boot(){
     if (saved) await tryUnlock(saved, true);
     else { try { const f = await GH.read(CONFIG.github.keyPath, false); GH.keyMissing = !!f.missing; } catch (e) {} }
   }
+  const before = R.cur;
   compute();
+  if (VIEW_W === before) VIEW_W = R.cur;
   $("#fWeek").value = String(R.cur);
   rerender();
   schedule();
@@ -1244,7 +1246,38 @@ function schedule(){
     schedule();
   }, delay);
 }
-document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && R) { clearTimeout(schedule.t); schedule.t = setTimeout(async () => { await loadSchedule([R.cur]); rerender(); schedule(); }, 300); } });
+// Toujours la dernière version de la page : le téléphone garde une copie jusqu'à 10 minutes (réglage de GitHub).
+// Si une version plus récente a été publiée, on recharge tout seul (au plus une fois par 2 minutes).
+if (/[?&]v=\d+/.test(location.search)) history.replaceState(null, "", location.pathname + location.hash);
+async function checkVersion(){
+  try {
+    const r = await fetch(location.pathname + "?nv=" + Date.now(), { method: "HEAD", cache: "no-store" });
+    const lm = Date.parse(r.headers.get("last-modified") || ""), mine = Date.parse(document.lastModified);
+    if (!r.ok || !lm || !mine || lm - mine < 2000) return;
+    let last = 0; try { last = +sessionStorage.getItem("pool-nfl:reloadAt") || 0; sessionStorage.setItem("pool-nfl:reloadAt", String(Date.now())); } catch (e) {}
+    if (Date.now() - last > 120e3) location.replace(location.pathname + "?v=" + lm + location.hash);
+  } catch (e) {}
+}
+setTimeout(checkVersion, 4000);
+setInterval(() => { if (document.visibilityState === "visible") checkVersion(); }, 10 * 60e3);
+// De retour sur la page : tout rafraîchir tout de suite (scores, drops et échanges, nouvelles)
+let hiddenAt = 0;
+function wakeUp(){
+  if (!R) return;
+  const away = hiddenAt ? Date.now() - hiddenAt : 0;
+  checkVersion();
+  clearTimeout(schedule.t);
+  schedule.t = setTimeout(async () => {
+    try {
+      await loadSchedule([R.cur, Math.min(W, R.cur + 1)]);
+      if (away > 60e3) { await Promise.all([loadData(), loadNews(), loadMvp()]); schedule.lastData = Date.now(); }
+      rerender();
+    } catch (e) {}
+    schedule();
+  }, 200);
+}
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") hiddenAt = Date.now(); else wakeUp(); });
+window.addEventListener("pageshow", (ev) => { if (ev.persisted) { hiddenAt = hiddenAt || 1; wakeUp(); } });
 init();
 })();
 </script>
