@@ -15,6 +15,15 @@
       "team": "PHI",
       "id": "muyde1idp7hj",
       "at": "2026-10-07T17:17:00.325Z"
+    },
+    {
+      "type": "trade",
+      "week": 5,
+      "player": "pete",
+      "team": "DAL",
+      "teamIn": "NYG",
+      "id": "mv4csiv95juv",
+      "at": "2026-10-11T21:46:53.445Z"
     }
   ]
 }
