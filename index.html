@@ -606,20 +606,30 @@ async function fetchWeek(w, force){
   const k = KEY("w" + w), c = ls.get(k);
   const near = c && c.games.some(g => new Date(g.date) - Date.now() < 3 * 86400e3);
   if (c && (c.final || (!force && Date.now() - c.at < (near ? 60e3 : 6 * 3600e3)))) return c.games.map(revive);
-  const r = await fetch(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?seasontype=2&week=${w}&dates=${CONFIG.season}`, { cache: "no-store" });
-  if (!r.ok) throw new Error("ESPN " + r.status);
-  const j = await r.json();
-  const games = (j.events || []).map(e => gameFromEspn(e, w));
-  const final = games.length > 0 && games.every(g => g.state === "post" || g.state === "off");
-  ls.set(k, { final, at: Date.now(), games });
-  return games;
+  try {
+    // « &_= » : toujours une copie fraîche (les serveurs d'ESPN gardent parfois une copie de quelques minutes)
+    const r = await fetch(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?seasontype=2&week=${w}&dates=${CONFIG.season}&_=${Date.now()}`, { cache: "no-store" });
+    if (!r.ok) throw new Error("ESPN " + r.status);
+    const j = await r.json();
+    const games = (j.events || []).map(e => gameFromEspn(e, w));
+    const final = games.length > 0 && games.every(g => g.state === "post" || g.state === "off");
+    ls.set(k, { final, at: Date.now(), games });
+    fetchWeek.fail.delete(w); fetchWeek.freshAt = Date.now();
+    return games;
+  } catch (e) {
+    // raté (réseau du téléphone qui se réveille, ESPN occupé…) : on garde les derniers résultats reçus, et on réessaie dans quelques secondes
+    fetchWeek.fail.add(w);
+    if (c) return c.games.map(revive);
+    throw e;
+  }
 }
+fetchWeek.fail = new Set(); fetchWeek.freshAt = 0;
 async function loadSchedule(onlyWeeks){
   const list = onlyWeeks || Array.from({ length: W }, (_, i) => i + 1);
   const res = await Promise.allSettled(list.map(w => fetchWeek(w, !!onlyWeeks)));
   let ok = 0;
   res.forEach((r, i) => { if (r.status === "fulfilled" && r.value.length) { WEEKS[list[i]] = r.value; ok++; } });
-  if (ok) { SOURCE = "live"; FETCHED_AT = new Date(); ls.set(KEY("teams"), TEAMS); }
+  if (ok) { SOURCE = "live"; FETCHED_AT = new Date(fetchWeek.freshAt || Date.now()); ls.set(KEY("teams"), TEAMS); }
   return ok;
 }
 
@@ -819,7 +829,9 @@ function renderStatus(){
   const pill = $("#statusPill"), txt = $("#statusTxt");
   const live = R.weeks.some(x => x && x.games.some(g => g.state === "in"));
   pill.className = "pill " + (SOURCE === "live" ? (live ? "live" : "ok") : "off");
-  if (SOURCE !== "live") txt.textContent = "Hors ligne · résultats du " + fmtShort.format(new Date(SNAPSHOT.taken));
+  const stale = SOURCE === "live" && R && fetchWeek.fail.has(R.cur);
+  if (stale) { pill.className = "pill off"; txt.textContent = "Mise à jour en cours… · données de " + fmtTime.format(FETCHED_AT); }
+  else if (SOURCE !== "live") txt.textContent = "Hors ligne · résultats du " + fmtShort.format(new Date(SNAPSHOT.taken));
   else if (live) txt.textContent = "En direct · mis à jour " + fmtTime.format(FETCHED_AT);
   else txt.textContent = "À jour · " + fmtTime.format(FETCHED_AT);
   $("#footSrc").textContent = SOURCE === "live" ? `Dernière mise à jour : ${fmtWhen.format(FETCHED_AT)}.` : "Résultats en direct indisponibles pour l'instant; affichage des dernières données connues.";
@@ -1228,12 +1240,15 @@ async function boot(){
   compute();
   $("#fWeek").value = String(R.cur);
   rerender();
-  schedule();
+  schedule.lastData = Date.now();
+  schedule(true);
 }
-function schedule(){
+function schedule(first){
   const live = R.weeks[R.cur]?.games.some(g => g.state === "in");
   const soon = R.weeks[R.cur]?.games.some(g => g.state === "pre" && g.date - Date.now() < 15 * 60e3 && g.date - Date.now() > -6 * 3600e3);
-  const delay = live || soon ? 60e3 : 10 * 60e3;
+  schedule.fails = fetchWeek.fail.has(R.cur) ? (schedule.fails || 0) + 1 : 0;
+  const behind = schedule.fails > 0 && schedule.fails <= 5; // au plus 5 essais rapides, ensuite le rythme normal
+  const delay = behind ? (first ? 2500 : 8e3) : first ? 4e3 : live || soon ? 60e3 : 10 * 60e3;
   clearTimeout(schedule.t);
   schedule.t = setTimeout(async () => {
     if (document.visibilityState === "visible") {
