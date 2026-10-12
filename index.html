@@ -715,12 +715,19 @@ async function openToken(box, code){
 function cleanData(d){ return d && Array.isArray(d.entries) ? d : { entries: [] }; }
 async function loadData(){
   if (!GH.on) { DATA = cleanData(ls.get(KEY("demo"))); return; }
-  try {
-    const f = await GH.read(CONFIG.github.dataPath, true);
-    DATA = f.missing ? { entries: [] } : cleanData(JSON.parse(f.text));
-  } catch (e) {
-    try { const f = await GH.readRaw(CONFIG.github.dataPath); DATA = f.missing ? { entries: [] } : cleanData(JSON.parse(f.text)); } catch (e2) {}
+  // Drops et échanges : sans code, la copie « raw » de GitHub d'abord (pas de limite de 60 lectures à l'heure) ; avec le code, l'API.
+  // Si rien ne répond, on GARDE les dernières données connues (jamais un classement sans drops ni échanges), et on réessaie vite.
+  const p = CONFIG.github.dataPath;
+  const tries = GH.token ? [() => GH.read(p, true), () => GH.readRaw(p)] : [() => GH.readRaw(p), () => GH.read(p, false)];
+  for (const t of tries) {
+    try {
+      const f = await t();
+      if (f.missing) continue;
+      DATA = cleanData(JSON.parse(f.text)); ls.set(KEY("data"), DATA); loadData.fail = false; loadData.at = Date.now();
+      return;
+    } catch (e) {}
   }
+  loadData.fail = true;
 }
 async function mutate(fn, message){
   if (!GH.on) { const d = cleanData(JSON.parse(JSON.stringify(DATA))); fn(d); DATA = d; ls.set(KEY("demo"), DATA); return; }
@@ -831,6 +838,7 @@ function renderStatus(){
   pill.className = "pill " + (SOURCE === "live" ? (live ? "live" : "ok") : "off");
   const stale = SOURCE === "live" && R && fetchWeek.fail.has(R.cur);
   if (stale) { pill.className = "pill off"; txt.textContent = "Mise à jour en cours… · données de " + fmtTime.format(FETCHED_AT); }
+  else if (GH.on && loadData.fail) { pill.className = "pill off"; txt.textContent = loadData.at || DATA.entries.length ? "Drops et échanges : nouvel essai…" : "Drops et échanges pas encore chargés…"; }
   else if (SOURCE !== "live") txt.textContent = "Hors ligne · résultats du " + fmtShort.format(new Date(SNAPSHOT.taken));
   else if (live) txt.textContent = "En direct · mis à jour " + fmtTime.format(FETCHED_AT);
   else txt.textContent = "À jour · " + fmtTime.format(FETCHED_AT);
@@ -1159,7 +1167,7 @@ async function onDelete(id){
 }
 async function tryUnlock(code, silent){
   try {
-    const f = await GH.read(CONFIG.github.keyPath, false).catch(() => GH.readRaw(CONFIG.github.keyPath));
+    const f = await GH.readRaw(CONFIG.github.keyPath).then(f => f.missing ? GH.read(CONFIG.github.keyPath, false) : f).catch(() => GH.read(CONFIG.github.keyPath, false));
     if (f.missing) { GH.keyMissing = true; renderManage(); return false; }
     GH.token = await openToken(JSON.parse(f.text), code);
     if ($("#rememberIn").checked) ls.set(KEY("code"), code);
@@ -1223,7 +1231,7 @@ function init(){
   $("#setupBtn").onclick = onSetup;
 
   WEEKS = snapshotWeeks();
-  DATA = GH.on ? { entries: [] } : cleanData(ls.get(KEY("demo")));
+  DATA = GH.on ? cleanData(ls.get(KEY("data"))) : cleanData(ls.get(KEY("demo")));
   compute();
   fillSelect($("#fWeek"), Array.from({ length: W }, (_, i) => [String(i + 1), "Semaine " + (i + 1)]));
   $("#fWeek").value = String(R.cur);
@@ -1235,7 +1243,7 @@ async function boot(){
   if (GH.on) {
     const saved = ls.get(KEY("code"));
     if (saved) await tryUnlock(saved, true);
-    else { try { const f = await GH.read(CONFIG.github.keyPath, false); GH.keyMissing = !!f.missing; } catch (e) {} }
+    else { try { const f = await GH.readRaw(CONFIG.github.keyPath).then(f => f.missing ? GH.read(CONFIG.github.keyPath, false) : f); GH.keyMissing = !!f.missing; } catch (e) {} }
   }
   compute();
   $("#fWeek").value = String(R.cur);
@@ -1246,14 +1254,14 @@ async function boot(){
 function schedule(first){
   const live = R.weeks[R.cur]?.games.some(g => g.state === "in");
   const soon = R.weeks[R.cur]?.games.some(g => g.state === "pre" && g.date - Date.now() < 15 * 60e3 && g.date - Date.now() > -6 * 3600e3);
-  schedule.fails = fetchWeek.fail.has(R.cur) ? (schedule.fails || 0) + 1 : 0;
+  schedule.fails = fetchWeek.fail.has(R.cur) || (GH.on && loadData.fail) ? (schedule.fails || 0) + 1 : 0;
   const behind = schedule.fails > 0 && schedule.fails <= 5; // au plus 5 essais rapides, ensuite le rythme normal
   const delay = behind ? (first ? 2500 : 8e3) : first ? 4e3 : live || soon ? 60e3 : 10 * 60e3;
   clearTimeout(schedule.t);
   schedule.t = setTimeout(async () => {
     if (document.visibilityState === "visible") {
       await loadSchedule([R.cur, Math.min(W, R.cur + 1)]);
-      if (Date.now() - (schedule.lastData || 0) > 4 * 60e3) { await Promise.all([loadData(), loadNews(), loadMvp()]); schedule.lastData = Date.now(); }
+      if (loadData.fail || Date.now() - (schedule.lastData || 0) > 4 * 60e3) { await Promise.all([loadData(), loadNews(), loadMvp()]); schedule.lastData = Date.now(); }
       rerender();
     }
     schedule();
