@@ -40,6 +40,14 @@
       "team": "CHI",
       "id": "mv8lrkjz03v6",
       "at": "2026-10-14T21:09:10.223Z"
+    },
+    {
+      "type": "drop",
+      "week": 6,
+      "player": "ben",
+      "team": "JAX",
+      "id": "mv8lrtdzdaww",
+      "at": "2026-10-14T21:09:21.671Z"
     }
   ]
 }
