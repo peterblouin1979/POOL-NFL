@@ -207,6 +207,9 @@ section.block{display:grid;gap:18px;padding-block:44px 8px;min-width:0}
 .heat td.pre small.lo{color:#5fd39a}
 .heat td.pre small.hi{color:#ff8f93}
 .heat td.na{background:transparent}
+.heat tr.gone td{opacity:.38}
+.heat tr.gone th .th-in{opacity:.5}
+.heat .gone-tag{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);border:1px solid var(--line-2);border-radius:999px;padding:1px 6px}
 .heat td.sum{background:transparent;color:var(--ink);font:800 1rem var(--display)}
 .heat tr.cur-col td:nth-child(n){}
 .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.8rem;color:var(--muted)}
@@ -994,9 +997,13 @@ function renderHeat(){
   P.forEach(p => {
     const teams = [];
     for (let w = 1; w <= W; w++) R.weeks[w].per[p.id].roster.forEach(t => { if (!teams.includes(t)) teams.push(t); });
+    // équipes échangées (plus dans l'alignement actuel) : tout en bas, en grisé
+    const now = R.weeks[R.cur]?.per[p.id].roster || [];
+    const gone = (t) => !now.includes(t);
+    teams.sort((a, b) => gone(a) - gone(b));
     h += `<tr class="grp" style="--pc:${p.color}"><th colspan="${W + 2}">${esc(p.name)}</th></tr>`;
     teams.forEach(t => {
-      h += `<tr><th><span class="th-in">${logo(t, "sm")}${esc(tName(t))}</span></th>`;
+      h += `<tr class="${gone(t) ? "gone" : ""}"><th><span class="th-in">${logo(t, "sm")}${esc(tName(t))}${gone(t) ? '<small class="gone-tag">échangée</small>' : ""}</span></th>`;
       for (let w = 1; w <= W; w++) {
         const wk = R.weeks[w], pr = wk.per[p.id];
         if (!pr.roster.includes(t)) { h += `<td class="na"></td>`; continue; }
