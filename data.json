@@ -48,6 +48,14 @@
       "team": "JAX",
       "id": "mv8lrtdzdaww",
       "at": "2026-10-14T21:09:21.671Z"
+    },
+    {
+      "type": "drop",
+      "week": 6,
+      "player": "steve",
+      "team": "DEN",
+      "id": "mv8tef1upr9y",
+      "at": "2026-10-15T00:42:53.490Z"
     }
   ]
 }
