@@ -56,6 +56,14 @@
       "team": "DEN",
       "id": "mv8tef1upr9y",
       "at": "2026-10-15T00:42:53.490Z"
+    },
+    {
+      "type": "drop",
+      "week": 6,
+      "player": "steve",
+      "team": "TB",
+      "id": "mv8teq6s30rx",
+      "at": "2026-10-15T00:43:07.924Z"
     }
   ]
 }
