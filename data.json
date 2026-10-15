@@ -64,6 +64,14 @@
       "team": "TB",
       "id": "mv8teq6s30rx",
       "at": "2026-10-15T00:43:07.924Z"
+    },
+    {
+      "type": "drop",
+      "week": 6,
+      "player": "steve",
+      "team": "LAC",
+      "id": "mv8teyjs1fk7",
+      "at": "2026-10-15T00:43:18.760Z"
     }
   ]
 }
