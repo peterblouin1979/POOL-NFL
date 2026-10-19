@@ -80,6 +80,22 @@ section.block{display:grid;gap:18px;padding-block:44px 8px;min-width:0}
 .tag{font:700 .68rem/1 var(--body);text-transform:uppercase;letter-spacing:.1em;padding:5px 8px;border-radius:999px;background:var(--amber-soft);color:var(--amber)}
 .tag.warn{background:var(--loss-soft);color:#ff9a9d}
 .plyr-main{display:flex;align-items:end;justify-content:space-between;gap:12px}
+/* Égalité : un encadré, les participants côte à côte avec « = » */
+.tie{grid-column:span var(--n);position:relative;background:linear-gradient(180deg,var(--panel-2),var(--panel));border:1px solid var(--line);border-radius:var(--r);padding:14px 16px 14px;display:grid;gap:12px;align-content:start}
+.tie.lead{border-color:rgba(255,184,28,.45);box-shadow:0 0 0 1px rgba(255,184,28,.15),0 18px 50px -24px rgba(255,184,28,.45)}
+.tie.lead .rk{color:var(--amber)}
+.tie .tag.soft{background:var(--line);color:var(--muted)}
+.tie-row{display:flex;align-items:stretch}
+.tie-p{flex:1 1 0;min-width:0;display:grid;gap:8px;align-content:start;border-top:4px solid var(--pc);padding-top:10px}
+.tie-p h3{font-size:clamp(1.3rem,4.6vw,1.9rem);font-weight:900;text-transform:uppercase;color:var(--pc);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tie-p .big{font-size:clamp(3rem,10vw,4.6rem)}
+.tie-p .big small{text-align:left}
+.tie-eq{align-self:center;font:900 clamp(2rem,7vw,3rem)/1 var(--display);color:var(--amber);padding:0 clamp(8px,2.5vw,18px);margin-top:18px}
+.stats.tie-stats{grid-template-columns:1fr;gap:5px}
+.stats.tie-stats div{flex-direction:row;align-items:baseline;justify-content:space-between;gap:8px}
+.stats.tie-stats dt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stats.tie-stats dd{font-size:1.15rem;white-space:nowrap}
+@media (max-width:760px){.tie{grid-column:auto}}
 .plyr h3{font-size:2rem;font-weight:900;text-transform:uppercase;color:var(--pc)}
 .big{font:900 clamp(4.2rem,9vw,5.6rem)/.8 var(--display);font-variant-numeric:tabular-nums;color:var(--ink);
   text-shadow:0 0 28px color-mix(in srgb,var(--pc) 55%,transparent)}
@@ -849,22 +865,44 @@ function renderStatus(){
   $("#seasonLbl").textContent = `${CONFIG.seasonLabel} · semaine ${R.cur}`;
 }
 function renderHero(){
-  const lastW = R.lastFinal;
-  $("#board").innerHTML = R.standings.map(s => {
+  const lastW = R.lastFinal, wkNow = R.weeks[R.cur];
+  const left = (p) => R.catchUp[p.id] ? "illimités" : Math.max(0, CONFIG.tradesPerSeason - R.tradesUsed[p.id]);
+  const pt = (n) => n + (n >= 2 ? " pts" : " pt");
+  const liveNote = (p) => wkNow.state === "live" ? `<div class="stats" style="border-top:0;padding-top:0"><div><dt>Sem. ${R.cur} en cours</dt><dd>${pt(wkNow.per[p.id].pts)}</dd></div></div>` : "";
+  const card = (s) => {
     const p = s.p, cu = R.catchUp[p.id];
-    const wkNow = R.weeks[R.cur], pr = wkNow.per[p.id];
-    const liveNote = wkNow.state === "live" ? `<div class="stats" style="border-top:0;padding-top:0"><div><dt>Sem. ${R.cur} en cours</dt><dd>${pr.pts} pts</dd></div></div>` : "";
-    const left = CONFIG.tradesPerSeason - R.tradesUsed[p.id];
     return `<article class="plyr ${s.rank === 1 ? "lead" : ""}" style="--pc:${p.color}">
-      <div class="plyr-top"><span class="rk">${ord(s.rank)}${R.standings.filter(x => x.total === s.total).length > 1 ? " ex æquo" : ""}</span>
+      <div class="plyr-top"><span class="rk">${ord(s.rank)}</span>
         ${s.rank === 1 ? `<span class="tag">En tête</span>` : cu ? `<span class="tag warn">Rattrapage</span>` : ""}</div>
       <div class="plyr-main"><h3>${esc(p.name)}</h3><div class="big">${s.total}<small>points</small></div></div>
       <dl class="stats">
         <div><dt>Écart</dt><dd>${s.gap === 0 ? "—" : s.gap}</dd></div>
-        <div><dt>${lastW ? "Sem. " + lastW : "Semaine"}</dt><dd>${lastW ? R.pts[p.id][lastW - 1] + " pts" : "—"}</dd></div>
-        <div><dt>Échanges restants</dt><dd>${cu ? "illimités" : Math.max(0, left)}</dd></div>
-      </dl>${liveNote}
+        <div><dt>${lastW ? "Sem. " + lastW : "Semaine"}</dt><dd>${lastW ? pt(R.pts[p.id][lastW - 1]) : "—"}</dd></div>
+        <div><dt>Échanges restants</dt><dd>${left(p)}</dd></div>
+      </dl>${liveNote(p)}
     </article>`;
+  };
+  // Égalité : un seul encadré, les participants côte à côte avec un « = » entre eux
+  const tieCard = (s) => {
+    const p = s.p;
+    return `<div class="tie-p" style="--pc:${p.color}">
+      <h3>${esc(p.name)}</h3><div class="big">${s.total}<small>points</small></div>
+      <dl class="stats tie-stats">
+        <div><dt>${lastW ? "Sem. " + lastW : "Semaine"}</dt><dd>${lastW ? pt(R.pts[p.id][lastW - 1]) : "—"}</dd></div>
+        <div><dt>Échanges</dt><dd>${left(p)}</dd></div>
+        ${wkNow.state === "live" ? `<div><dt>Sem. ${R.cur} en cours</dt><dd>${pt(wkNow.per[p.id].pts)}</dd></div>` : ""}
+      </dl></div>`;
+  };
+  const groups = [];
+  R.standings.forEach(s => { const g = groups.find(x => x.rank === s.rank); if (g) g.list.push(s); else groups.push({ rank: s.rank, list: [s] }); });
+  $("#board").innerHTML = groups.map(g => {
+    if (g.list.length === 1) return card(g.list[0]);
+    const s0 = g.list[0], cu = g.list.some(s => R.catchUp[s.p.id]);
+    return `<section class="tie ${g.rank === 1 ? "lead" : ""}" style="--n:${g.list.length}" aria-label="Égalité au ${ord(g.rank)} rang">
+      <div class="plyr-top"><span class="rk">${ord(g.rank)} · égalité</span>
+        ${g.rank === 1 ? `<span class="tag">En tête</span>` : `<span class="tag ${cu ? "warn" : "soft"}">Écart ${s0.gap}</span>`}</div>
+      <div class="tie-row">${g.list.map(tieCard).join('<span class="tie-eq" aria-hidden="true">=</span>')}</div>
+    </section>`;
   }).join("");
 }
 
