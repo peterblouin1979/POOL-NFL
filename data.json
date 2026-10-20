@@ -72,6 +72,15 @@
       "team": "LAC",
       "id": "mv8teyjs1fk7",
       "at": "2026-10-15T00:43:18.760Z"
+    },
+    {
+      "type": "trade",
+      "week": 7,
+      "player": "ben",
+      "team": "IND",
+      "teamIn": "DAL",
+      "id": "mvh7nm5l1hem",
+      "at": "2026-10-20T21:44:06.633Z"
     }
   ]
 }
