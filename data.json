@@ -81,6 +81,15 @@
       "teamIn": "DAL",
       "id": "mvh7nm5l1hem",
       "at": "2026-10-20T21:44:06.633Z"
+    },
+    {
+      "type": "trade",
+      "week": 7,
+      "player": "pete",
+      "team": "PHI",
+      "teamIn": "CAR",
+      "id": "mvhcm2yj604g",
+      "at": "2026-10-21T00:02:53.179Z"
     }
   ]
 }
