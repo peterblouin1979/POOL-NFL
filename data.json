@@ -107,6 +107,14 @@
       "teamIn": "CLE",
       "id": "mvipdtbwfyw4",
       "at": "2026-10-21T22:48:08.636Z"
+    },
+    {
+      "type": "drop",
+      "week": 7,
+      "player": "steve",
+      "team": "NE",
+      "id": "mvipgrjmv0zl",
+      "at": "2026-10-21T22:50:26.290Z"
     }
   ]
 }
