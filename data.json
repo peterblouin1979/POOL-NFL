@@ -90,6 +90,14 @@
       "teamIn": "CAR",
       "id": "mvhcm2yj604g",
       "at": "2026-10-21T00:02:53.179Z"
+    },
+    {
+      "type": "drop",
+      "week": 7,
+      "player": "pete",
+      "team": "NYG",
+      "id": "mvhcz6oni445",
+      "at": "2026-10-21T00:13:04.535Z"
     }
   ]
 }
