@@ -98,6 +98,15 @@
       "team": "NYG",
       "id": "mvhcz6oni445",
       "at": "2026-10-21T00:13:04.535Z"
+    },
+    {
+      "type": "trade",
+      "week": 7,
+      "player": "steve",
+      "team": "TB",
+      "teamIn": "CLE",
+      "id": "mvipdtbwfyw4",
+      "at": "2026-10-21T22:48:08.636Z"
     }
   ]
 }
