@@ -115,6 +115,14 @@
       "team": "NE",
       "id": "mvipgrjmv0zl",
       "at": "2026-10-21T22:50:26.290Z"
+    },
+    {
+      "type": "drop",
+      "week": 7,
+      "player": "pete",
+      "team": "GB",
+      "id": "mvk0uc3strhl",
+      "at": "2026-10-22T20:56:41.416Z"
     }
   ]
 }
