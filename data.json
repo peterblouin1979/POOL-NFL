@@ -123,6 +123,14 @@
       "team": "GB",
       "id": "mvk0uc3strhl",
       "at": "2026-10-22T20:56:41.416Z"
+    },
+    {
+      "type": "drop",
+      "week": 9,
+      "player": "pete",
+      "team": "BAL",
+      "id": "mw3xsmiaeit5",
+      "at": "2026-11-05T19:26:46.258Z"
     }
   ]
 }
