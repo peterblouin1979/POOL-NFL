@@ -139,6 +139,15 @@
       "team": "BUF",
       "id": "mw42bmavsodz",
       "at": "2026-11-05T21:33:30.919Z"
+    },
+    {
+      "type": "trade",
+      "week": 10,
+      "player": "steve",
+      "team": "LAC",
+      "teamIn": "LV",
+      "id": "mwcpr3bzynwn",
+      "at": "2026-11-11T22:51:33.407Z"
     }
   ]
 }
