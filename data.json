@@ -148,6 +148,14 @@
       "teamIn": "LV",
       "id": "mwcpr3bzynwn",
       "at": "2026-11-11T22:51:33.407Z"
+    },
+    {
+      "type": "drop",
+      "week": 10,
+      "player": "pete",
+      "team": "CAR",
+      "id": "mwe14qxm7iq9",
+      "at": "2026-11-12T20:57:52.474Z"
     }
   ]
 }
