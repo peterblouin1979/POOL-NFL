@@ -159,6 +159,7 @@ section.block{display:grid;gap:18px;padding-block:44px 8px;min-width:0}
 .ch.r{color:#ff8f93;border-color:rgba(229,72,77,.5);background:rgba(229,72,77,.1)}
 .ch.won{color:var(--win);background:var(--win-soft);border-color:transparent}
 .ch.lost,.ch.z{opacity:.45}
+.ch.dr{border-style:dashed;background:transparent}
 .ch.lv > b::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;margin-right:5px;vertical-align:1px;animation:blink 1.2s ease-in-out infinite}
 @keyframes blink{50%{opacity:.25}}
 .odds-help{margin-top:2px}
@@ -954,13 +955,14 @@ function renderWeek(){
     const chipOf = (t) => {
       const r = pr.results[t], g = wk.gameOf[t];
       if (r === "BYE") return [9, `<span class="ch z" title="${esc(tName(t))} : en bye">${logo(t, "sm")}<b>bye</b></span>`];
+      if (r === "DROP") return [10, `<span class="ch z dr" title="${esc(tName(t))} : droppée cette semaine">${logo(t, "sm")}<b>drop</b></span>`];
       if (r === "W") return [0, `<span class="ch won" title="${esc(tName(t))} : victoire">${logo(t, "sm")}<b>V</b></span>`];
       if (r === "L" || r === "T") return [8, `<span class="ch lost" title="${esc(tName(t))} : ${r === "L" ? "défaite" : "nulle"}">${logo(t, "sm")}<b>${r === "L" ? "D" : "N"}</b></span>`];
       const p = chance(g, t), live = r !== "PRE", home = g.home.t === t, me = home ? g.home : g.away, op = home ? g.away : g.home;
       const why = live ? `en cours ${me.s}-${op.s} contre ${tName(op.t)}` : `${home ? "contre" : "à"} ${tName(op.t)}`;
       return [1 + (1 - (p ?? .5)), `<span class="ch ${tone(p) || "n"}${live ? " lv" : ""}" title="${esc(tName(t))} ${esc(why)} · ${pct(p)} de chances de gagner">${logo(t, "sm")}<b>${pct(p)}</b></span>`];
     };
-    const chips = pr.roster.filter(t => !pr.drops.includes(t)).map(chipOf).sort((a, b) => a[0] - b[0]).map(x => x[1]).join("");
+    const chips = pr.roster.map(chipOf).sort((a, b) => a[0] - b[0]).map(x => x[1]).join("");
     const bits = [];
     if (pr.lead) bits.push(`${pr.lead} en avance`);
     if (pr.close) bits.push(`${pr.close} à égalité ou en retard`);
