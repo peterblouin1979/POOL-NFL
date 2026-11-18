@@ -156,6 +156,14 @@
       "team": "CAR",
       "id": "mwe14qxm7iq9",
       "at": "2026-11-12T20:57:52.474Z"
+    },
+    {
+      "type": "drop",
+      "week": 11,
+      "player": "pete",
+      "team": "BAL",
+      "id": "mwmh4yeqf3tz",
+      "at": "2026-11-18T18:48:05.426Z"
     }
   ]
 }
