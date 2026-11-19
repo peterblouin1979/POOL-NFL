@@ -180,6 +180,14 @@
       "team": "HOU",
       "id": "mwmwtdsmtlev",
       "at": "2026-11-19T02:06:59.350Z"
+    },
+    {
+      "type": "drop",
+      "week": 11,
+      "player": "ben",
+      "team": "JAX",
+      "id": "mwmwtuy9xhb0",
+      "at": "2026-11-19T02:07:21.585Z"
     }
   ]
 }
