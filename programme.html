@@ -143,6 +143,8 @@ const ILL={
  pushdown:{st:'<rect x="154" y="6" width="8" height="122" rx="3"/><circle cx="150" cy="14" r="6"/>',cable:[150,14],a:{h:[96,24],s:[96,42],p:[94,76],k:[98,102],f:[94,128],e:[100,66],w:[116,46]},b:{w:[112,90]}},
  pulldown:{st:'<path d="M70 3H150"/><rect x="84" y="100" width="40" height="6" rx="3"/><path d="M104 106V128"/><rect x="118" y="82" width="18" height="7" rx="3"/>',cable:[108,3],a:{h:[100,50],s:[100,66],p:[98,98],k:[126,96],f:[128,126],e:[104,42],w:[108,18]},b:{e:[88,86],w:[106,60]}},
  pullup:{nf:1,st:'<path d="M56 14H152" style="stroke-width:5"/><path d="M60 14V2M148 14V2"/>',a:{h:[104,48],s:[104,64],e:[105,40],w:[106,16],p:[100,98],k:[104,118],f:[92,134]},b:{h:[106,28],s:[100,46],e:[92,30],p:[96,80],k:[102,102],f:[90,116]}},
+ fly:{st:BENCH,a:{...BB,e:[60,98],w:[62,110]},b:{e:[66,60],w:[66,38]}},
+ bulgarian:{st:'<rect x="26" y="86" width="42" height="7" rx="3"/><path d="M34 93V128M60 93V128"/>',a:{h:[100,20],s:[98,36],p:[96,70],k:[112,96],f:[118,128],k2:[78,98],f2:[56,84],e:[98,60],w:[100,84]},b:{h:[96,42],s:[94,58],p:[90,92],k:[120,100],k2:[70,112],e:[94,82],w:[96,106]}},
  row:{a:{...BO,e:[126,76],w:[126,102]},b:{e:[106,42],w:[114,68]}},
  birds:{a:{...BO,e:[126,78],w:[128,102]},b:{e:[124,40],w:[124,28]}},
  cablerow:{st:'<rect x="58" y="110" width="44" height="6" rx="3"/><rect x="138" y="88" width="6" height="32" rx="2"/><rect x="154" y="60" width="8" height="68" rx="3"/><circle cx="150" cy="108" r="6"/>',cable:[150,108],a:{h:[84,52],s:[82,68],p:[78,104],k:[108,88],f:[136,104],e:[104,80],w:[128,90]},b:{e:[62,86],w:[92,90]}},
@@ -160,7 +162,7 @@ const DAYS=[
  {id:'lundi',nm:'Lundi',ab:'Lun',foc:'Poussée',mus:'Pectoraux, épaules et triceps',c:'--push',ex:[
   ['Développé couché barre','Pectoraux','bench','bar'],
   ['Développé incliné haltères','Pectoraux','incline','db'],
-  ['Écarté à la poulie','Pectoraux','cross','handle','Aussi appelé crossover.'],
+  ['Écarté couché haltères','Pectoraux','fly','db','Bras légèrement pliés, ouvre jusqu\'à sentir l\'étirement des pectoraux.'],
   ['Développé épaules haltères assis','Épaules','ohp','db'],
   ['Élévations latérales haltères','Épaules','lat','db'],
   ['Extension triceps à la poulie','Triceps','pushdown','handle','Avec la corde.'],
@@ -175,7 +177,7 @@ const DAYS=[
   ['Curl poignets','Avant-bras','wrist','db']]},
  {id:'mercredi',nm:'Mercredi',ab:'Mer',foc:'Jambes',mus:'Focus quadriceps, plus ischios, mollets et abdos',c:'--legs',ex:[
   ['Squat','Quadriceps','squat','bar'],
-  ['Presse à cuisses','Quadriceps','legpress','plat'],
+  ['Fentes bulgares haltères','Quadriceps','bulgarian','db','Pied arrière sur le banc. Fais tes 8-10 répétitions de chaque côté.'],
   ['Extension de jambes','Quadriceps','legext','pad'],
   ['Leg curl couché','Ischios','legcurl','pad'],
   ['Mollets debout','Mollets','calf','db','Beaucoup préfèrent 12 à 15 répétitions ici.'],
@@ -187,7 +189,7 @@ const DAYS=[
   ['Tractions','Dos','pullup','','Ou tirage vertical si les tractions sont trop dures.'],
   ['Rowing un bras haltère','Dos','row','db','Un genou et une main appuyés sur un banc.'],
   ['Développé épaules à la machine','Épaules','ohp','handle'],
-  ['Élévations latérales à la poulie','Épaules','latc','handle']]},
+  ['Élévations latérales lentes','Épaules','lat','db','Avec haltères. Monte en 1 seconde, descends en 3 secondes pour varier de lundi.']]},
  {id:'samedi',nm:'Samedi',ab:'Sam',foc:'Jambes et bras',mus:'Focus ischios, plus triceps et biceps',c:'--legs',ex:[
   ['Soulevé de terre jambes tendues','Ischios','rdl','bar',"Dos plat, descends jusqu'à sentir l'étirement derrière les cuisses."],
   ['Leg curl couché','Ischios','legcurl','pad'],
@@ -213,6 +215,7 @@ function man(P,I,eq){
  if(I.cable){o+=`<line class="cab" x1="${P.w[0]}" y1="${P.w[1]}" x2="${I.cable[0]}" y2="${I.cable[1]}"/>`;
   if(m&&m.a){const mw=mir(P.w),mc=mir(I.cable);o+=`<line class="cab" x1="${mw[0]}" y1="${mw[1]}" x2="${mc[0]}" y2="${mc[1]}"/>`}}
  if(m&&m.l)o+=L(mir(P.p),mir(P.k),13)+L(mir(P.k),mir(P.f),11);
+ if(P.k2)o+=L(P.p,P.k2,13)+L(P.k2,P.f2,11);
  o+=L(P.p,P.k,13)+L(P.k,P.f,11);
  if(P.toe)o+=L(P.f,P.toe,7);
  o+=P.t?L([P.t[0],P.t[1]],[P.t[2],P.t[3]],22):L(P.s,P.p,16);
