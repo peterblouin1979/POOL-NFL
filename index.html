@@ -1350,5 +1350,11 @@ init();
 })();
 </script>
 
+<script>
+/* Bouton caché : 3 taps rapides sur le logo BPS ouvrent le programme d'entraînement */
+{const m=document.querySelector('.brand-mark');let n=0,t=0;
+ if(m){m.style.touchAction='manipulation';m.style.cursor='default';
+  m.addEventListener('click',()=>{const now=Date.now();n=now-t<700?n+1:1;t=now;if(n>=3){n=0;location.href='programme.html'}})}}
+</script>
 </body>
 </html>
