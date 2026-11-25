@@ -188,6 +188,14 @@
       "team": "JAX",
       "id": "mwmwtuy9xhb0",
       "at": "2026-11-19T02:07:21.585Z"
+    },
+    {
+      "type": "add",
+      "week": 12,
+      "player": "steve",
+      "team": "WSH",
+      "id": "mwwoho9pdf6l",
+      "at": "2026-11-25T22:11:37.885Z"
     }
   ]
 }
