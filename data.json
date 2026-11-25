@@ -196,6 +196,16 @@
       "team": "WSH",
       "id": "mwwoho9pdf6l",
       "at": "2026-11-25T22:11:37.885Z"
+    },
+    {
+      "type": "trade",
+      "week": 12,
+      "player": "steve",
+      "team": "LV",
+      "teamIn": "NYJ",
+      "free": true,
+      "id": "mwwoj2oc4xh2",
+      "at": "2026-11-25T22:12:43.212Z"
     }
   ]
 }
